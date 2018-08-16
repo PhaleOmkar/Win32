@@ -1,0 +1,6 @@
+#define MYBITMAP	101
+#define BMPMATRIX	102
+#define BMPMILKYWAY 103
+#define BMPSKY		104
+#define BMPEARTH	105
+#define MYICON		106

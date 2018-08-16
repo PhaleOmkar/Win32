@@ -1,0 +1,7 @@
+#include "MyResources.h"
+MYBITMAP	BITMAP	SplashScreen.bmp
+BMPMATRIX	BITMAP	matrix.bmp
+BMPMILKYWAY BITMAP	MilkyWay.bmp
+BMPSKY		BITMAP	sky.bmp
+BMPEARTH	BITMAP	earth.bmp
+MYICON		ICON	earth.ico
