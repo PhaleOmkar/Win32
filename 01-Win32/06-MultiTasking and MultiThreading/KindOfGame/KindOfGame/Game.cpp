@@ -1,14 +1,13 @@
 // Headers
 #include <Windows.h>
 #include <tchar.h>
+#include "Snake.h"
 
-// Global Variables
-int sizePlayer = 50;
 
 // Prototypes
 LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
 
-DWORD ThreadProcThree(LPVOID);
+DWORD ThreadSnakeMove(LPVOID);
 DWORD ThreadProcFour(LPVOID);
 
 // Structs
@@ -22,7 +21,15 @@ typedef struct tagCOLORS {
 typedef struct tagPOSITION {
 	int iX;
 	int iY;
-} POSITION, *LPPOSITION;
+} POSITION;
+
+typedef struct tagSTATE {
+	Snake Snake;
+	HWND hwnd;
+} STATE, *LPSTATE;
+
+static POSITION position = { 0, 0 };
+
 
 // WinMain
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszCmdLine, int iCmdShow)
@@ -84,7 +91,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
 	static HANDLE hThreadControl = NULL;
 
 	static COLORS colors = { 0, 0, 0, NULL };
-	static POSITION position = { 0, 0 };
+	
 
 	RECT rc;
 	HDC hdc;
@@ -99,7 +106,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
 		colors.hwnd = hwnd;
 
 		// Create Threads
-		//hThreadMove = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)ThreadProcThree, (LPVOID)&colors, 0, NULL);
+		hThreadMove = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)ThreadSnakeMove, (LPVOID)hwnd, 0, NULL);
 
 
 		break;
@@ -111,36 +118,36 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
 		case 'W':
 		case VK_UP:
 			if (position.iY == 0)
-				position.iY = sizePlayer;
+				position.iY = sizeCanvas;
 			else
 			{
-				position.iY = (position.iY - 1) % sizePlayer;
+				position.iY = (position.iY - 1) % sizeCanvas;
 			}
 			break;
 
 		case 'A':
 		case VK_LEFT:
 			if (position.iX == 0)
-				position.iX = sizePlayer;
+				position.iX = sizeCanvas;
 			else
 			{
-				position.iX = abs((position.iX - 1) % sizePlayer);
+				position.iX = abs((position.iX - 1) % sizeCanvas);
 			}
 			break;
 
 		case 'S':
 		case VK_DOWN:
-			position.iY = (position.iY + 1) % sizePlayer;
+			position.iY = (position.iY + 1) % sizeCanvas;
 			break;
 
 		case 'D':
 		case VK_RIGHT:
-			position.iX = (position.iX + 1) % sizePlayer;
+			position.iX = (position.iX + 1) % sizeCanvas;
 			break;
 		}
 
 		GetClientRect(hwnd, &rc);
-		InvalidateRect(hwnd, &rc, TRUE);
+		InvalidateRect(hwnd, &rc, FALSE);
 
 		break;
 
@@ -164,11 +171,10 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
 		rcCanvas.right = rcCanvas.left + size;
 		rcCanvas.bottom = rcCanvas.top + size;
 
-		rcPlayer.left = rcCanvas.left + (position.iX * (size / sizePlayer));
-		rcPlayer.right = rcPlayer.left + (size / sizePlayer);
-		rcPlayer.top = rcCanvas.top + (position.iY * (size / sizePlayer));
-		rcPlayer.bottom = rcPlayer.top + (size / sizePlayer);
-
+		rcPlayer.left = rcCanvas.left + (position.iX * (size / sizeCanvas));
+		rcPlayer.top = rcCanvas.top + (position.iY * (size / sizeCanvas));
+		rcPlayer.right = rcPlayer.left + (size / sizeCanvas);
+		rcPlayer.bottom = rcPlayer.top + (size / sizeCanvas);
 
 		hBrush = CreateSolidBrush(RGB(0, 0, 0));
 		FillRect(hdc, &rcCanvas, hBrush);
@@ -192,27 +198,23 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
 }
 
 //// Thread Procs
-//DWORD ThreadProcOne(LPVOID param)
-//{
-//	HWND hwnd = (HWND)param;
-//	TCHAR str[255];
-//	RECT rc;
-//	HDC hdc = GetDC(hwnd);
-//	SetTextColor(hdc, RGB(0, 255, 0));
-//	SetBkColor(hdc, RGB(0, 0, 0));
-//	for (int i = 0; i <= 32767; i++)
-//	{
-//		GetClientRect(hwnd, &rc);
-//		rc.right = rc.right / 2;
-//		InvalidateRect(hwnd, &rc, TRUE);
-//		wsprintf(str, TEXT("Incrementing: %d"), i);
-//		TextOut(hdc, 5, 5, str, _tcsclen(str));
-//	}
-//
-//	ReleaseDC(hwnd, hdc);
-//	return(0);
-//}
-//
+DWORD ThreadSnakeMove(LPVOID param)
+{
+	while (TRUE) 
+	{
+		Sleep(1000);
+		position.iX = position.iX++ % sizeCanvas;
+		position.iY = position.iY++ % sizeCanvas;
+		HWND hwnd = (HWND)param;
+		RECT rc;
+		HDC hdc = GetDC(hwnd);
+		GetClientRect(hwnd, &rc);
+		InvalidateRect(hwnd, &rc, TRUE);
+		ReleaseDC(hwnd, hdc);
+	}
+	return(0);
+}
+
 //DWORD ThreadProcTwo(LPVOID param)
 //{
 //

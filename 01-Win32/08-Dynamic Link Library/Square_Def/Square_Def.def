@@ -1,0 +1,5 @@
+LIBRARY Square_Def
+EXPORTS
+	MakeSquare
+	MakeSquareF
+	MakeSquareD

@@ -1,9 +1,17 @@
 // Headers
 #include <windows.h>
+#include <string.h>
 #include "MyResources.h"
+
+typedef struct tagDATA{
+	char szName[255];
+	char szNumber[15];
+	char szGender[10];
+} DATA;
 
 // global function declaration
 LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
+BOOL	CALLBACK DlgProc(HWND, UINT, WPARAM, LPARAM);
 
 // WinMain()
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszCmdLine, int iCmdShow)
@@ -34,7 +42,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszCmdLi
 
 	// create window
 	hwnd = CreateWindow(szAppName,
-		TEXT("My Application"),
+		TEXT("Project Earth"),
 		WS_OVERLAPPEDWINDOW,
 		CW_USEDEFAULT,
 		CW_USEDEFAULT,
@@ -81,7 +89,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
 		switch (wParam)
 		{
 		case VK_SPACE:
-			MessageBox(hwnd, TEXT("This is EARTH"), TEXT("Message Box"), MB_OK);
+			DialogBox(hInstance, TEXT("DLGBOX"), hwnd, DlgProc);
 			break;
 
 		case VK_ESCAPE:
@@ -101,11 +109,9 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
 		GetObject(hbmpImage, sizeof(BITMAP), &bmpImage);
 		SelectObject(hdcCompatible, hbmpImage);
 		BitBlt(hdc, 0, 0, cxClient, cyClient, hdcCompatible, 0, 0, SRCCOPY);
-		//StretchBlt(hdc, 0, 0, cxClient, cyClient, hdcCompatible, 0, 0, bmpImage.bmWidth, bmpImage.bmHeight, SRCCOPY);
 		DeleteDC(hdcCompatible);
 
 		GetClientRect(hwnd, &rc);
-		//hFont = (HFONT)GetStockObject(ANSI_FIXED_FONT);
 		hFont = CreateFont(30, 0, 0, 0, FW_SEMIBOLD, 0, 0, 0, DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, PROOF_QUALITY, FF_DONTCARE, TEXT("Consolas"));
 		SelectObject(hdc, hFont);
 		SetBkColor(hdc, RGB(0, 0, 0));
@@ -122,4 +128,56 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
 		break;
 	}
 	return(DefWindowProc(hwnd, iMsg, wParam, lParam));
+}
+
+BOOL CALLBACK DlgProc(HWND hDlg, UINT iMsg, WPARAM wParam, LPARAM lParam)
+{
+	static HANDLE hFile = NULL;
+	static DATA data;
+	static int iGender;
+
+	switch (iMsg)
+	{
+	case WM_INITDIALOG:
+		hFile = CreateFile(TEXT("data.txt"), GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+		CheckRadioButton(hDlg, ID_RBMALE, ID_RBFEMALE, iGender);
+		return TRUE;
+
+	case WM_COMMAND:
+		switch (LOWORD(wParam))
+		{
+		case ID_RBMALE:
+		case ID_RBFEMALE:
+			iGender = LOWORD(wParam);
+			return TRUE;
+
+		case IDOK:
+			char szData[255];
+			GetDlgItemText(hDlg, ID_ETNAME, data.szName, 255);
+			GetDlgItemText(hDlg, ID_ETPHONE, data.szNumber, 15);
+
+			switch (iGender)
+			{
+			case ID_RBMALE:
+				wsprintf(data.szGender, TEXT("Male"));
+				break;
+
+			case ID_RBFEMALE:
+				wsprintf(data.szGender, TEXT("Female"));
+				break;
+			}
+
+			wsprintf(szData, TEXT("Name: %s\nPhone: %s\nGender: %s"), data.szName, data.szNumber, data.szGender);
+			WriteFile(hFile, szData, strlen(szData), NULL, NULL);
+			MessageBox(hDlg, TEXT("Data Saved!"), TEXT("Message"), MB_OK | MB_ICONINFORMATION);
+			return TRUE;
+
+		case IDCANCEL:
+			CloseHandle(hFile);
+			EndDialog(hDlg, 0);
+			return TRUE;
+		}
+		break;
+	}
+	return FALSE;
 }

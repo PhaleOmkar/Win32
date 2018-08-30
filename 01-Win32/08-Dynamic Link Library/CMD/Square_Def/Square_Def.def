@@ -1,0 +1,3 @@
+LIBRARY Square_Def
+EXPORTS
+	MakeSquare

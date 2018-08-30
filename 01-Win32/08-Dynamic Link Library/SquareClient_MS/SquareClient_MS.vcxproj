@@ -20,8 +20,8 @@
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>
-    <ProjectGuid>{5290BB8D-30EA-4B79-8C65-0028FF3A8D15}</ProjectGuid>
-    <RootNamespace>KindOfGame</RootNamespace>
+    <ProjectGuid>{EC85C164-A270-44EC-8E74-34A2F9D60FB7}</ProjectGuid>
+    <RootNamespace>SquareClientMS</RootNamespace>
     <WindowsTargetPlatformVersion>10.0.17134.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -77,6 +77,7 @@
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
     </ClCompile>
+    <Link />
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -115,10 +116,16 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Game.cpp" />
+    <ClCompile Include="SquareClient_MS.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Snake.h" />
+    <ClInclude Include="Square_MS.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="MyIcon.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="SquareClient_MS.rc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
