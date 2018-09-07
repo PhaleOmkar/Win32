@@ -12,8 +12,8 @@ typedef struct tagCOLORS {
 } COLORS, *LPCOLORS;
 
 typedef struct tagFOOD {
-	int iX;
-	int iY;
+	LONG iX;
+	LONG iY;
 } FOOD;
 
 typedef struct tagSNAKE {
@@ -93,15 +93,18 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
 {
 	static HANDLE hThreadMove = NULL;
 	static HANDLE hMutex = NULL;
-	static STATE State;
 
+	static COLORS colors = { 0, 0, 0, NULL };
+
+	static STATE State;
+	static RECT rcUnit, rcCanvas;
 	RECT rc;
-	HDC hdc;
+	static HDC hdc;
 	PAINTSTRUCT ps;
 	HBRUSH hBrush;
 	// HBRUSH hbrDarkGreen, hbrLightGreen;
-	TCHAR lpszScore[200];
-	int height, width, size, iResult;
+	TCHAR lpszScore[255]=TEXT("");
+	static int height, width, size, iResult;
 
 	switch (iMsg)
 	{
@@ -161,7 +164,6 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
 			break;
 
 		case VK_ESCAPE:
-
 			// Pause Game
 			SuspendThread(hThreadMove);
 
@@ -179,10 +181,6 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
 		break;
 
 	case WM_PAINT:
-
-		int iUnitSize;
-		RECT rcUnit, rcCanvas;
-
 		hdc = BeginPaint(hwnd, &ps);
 		GetClientRect(hwnd, &rc);
 
@@ -199,66 +197,42 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
 		// hbrLightGreen = CreateSolidBrush(RGB(0, 95, 0));
 		// hbrDarkGreen = CreateSolidBrush(RGB(0, 75, 0));
 
-		// Fill Canvas like Grass Pattern
-		/*
-		for (int i = 0; i < SIZE; i++)
-		{
-			for (int j = 0; j < SIZE; j++)
-			{
-				rcUnit.left = rcCanvas.left + (i * (size / SIZE));
-				rcUnit.top = rcCanvas.top + (j * (size / SIZE));
-				rcUnit.right = rcUnit.left + (size / SIZE);
-				rcUnit.bottom = rcUnit.top + (size / SIZE);
-
-				if ((i + j) % 2 == 0)
-				{
-					FillRect(hdc, &rcUnit, hbrLightGreen);
-				}
-				else
-				{
-					FillRect(hdc, &rcUnit, hbrDarkGreen);
-				}
-			}
-		}
-		*/
-
 		// Fill canvas in all black
 		hBrush = CreateSolidBrush(RGB(0, 0, 0));
 		FillRect(hdc, &rcCanvas, hBrush);
 
 		// Draw Snake
-		iUnitSize = size / SIZE;
 		OpenMutex(SYNCHRONIZE, FALSE, TEXT("SnakeMutex"));
-		for (int i = 0; i < State.Snake.iLength; i++)	
+		for (int i = 0; i < State.Snake.iLength; i++)
 		{
-			rcUnit.left = rcCanvas.left + (State.Snake.body[i][0] * (iUnitSize));
-			rcUnit.top = rcCanvas.top + (State.Snake.body[i][1] * (iUnitSize));
-			rcUnit.right = rcUnit.left + (iUnitSize);
-			rcUnit.bottom = rcUnit.top + (iUnitSize);
+			rcUnit.left = rcCanvas.left + (State.Snake.body[i][0] * (size / SIZE));
+			rcUnit.top = rcCanvas.top + (State.Snake.body[i][1] * (size / SIZE));
+			rcUnit.right = rcUnit.left + (size / SIZE);
+			rcUnit.bottom = rcUnit.top + (size / SIZE);
 
-			//hBrush = CreateSolidBrush(RGB(255, 255, 255));  /* White Snake */
-			hBrush = CreateSolidBrush(RGB(255 - (i*2), 255 - (i * 2), 255 - (i * 2))); /* White Gradiant Snake*/
+			hBrush = CreateSolidBrush(RGB(255, 0, 0));  /* White Snake */
+			//hBrush = CreateSolidBrush(RGB(255 - (i*2), 255 - (i * 2), 255 - (i * 2))); /* White Gradiant Snake*/
 			//hBrush = CreateSolidBrush(RGB(128, 64, 0)); /* Brown Snake*/
 			FillRect(hdc, &rcUnit, hBrush);
 		}
 		ReleaseMutex(hMutex);
 
 		// Draw Food
-		rcUnit.left = rcCanvas.left + (State.Food.iX * (iUnitSize));
-		rcUnit.top = rcCanvas.top + (State.Food.iY * (iUnitSize));
-		rcUnit.right = rcUnit.left + (iUnitSize);
-		rcUnit.bottom = rcUnit.top + (iUnitSize);
+		/*rcUnit.left = rcCanvas.left + (State.Food.iX * (size / SIZE));
+		rcUnit.top = rcCanvas.top + (State.Food.iY * (size / SIZE));
+		rcUnit.right = rcUnit.left + (size / SIZE);
+		rcUnit.bottom = rcUnit.top + (size / SIZE);
 
-		hBrush = CreateSolidBrush(RGB(255, 0, 0));
+		hBrush = CreateSolidBrush(RGB(0, 255, 128));
 		FillRect(hdc, &rcUnit, hBrush);
-
+*/
 		// Draw Score
 		wsprintf(lpszScore, TEXT("Score: %d\nSnake:\n Length: %d\n Head:\n  X: %d\n  Y: %d\nFood:\n X: %d\n Y: %d"), State.iScore, State.Snake.iLength, State.Snake.body[0][0], State.Snake.body[0][1], State.Food.iX, State.Food.iY);
 		SetTextColor(hdc, RGB(0, 0, 0));
 		DrawText(hdc, lpszScore, -1, &rc, DT_LEFT);
 
 		// Finish
-		DeleteObject(hBrush);
+		//DeleteObject(hBrush);
 		EndPaint(hwnd, &ps);
 
 		break;
@@ -277,16 +251,16 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
 DWORD ThreadSnakeMove(LPVOID param)
 {
 	int iResult;
-	TCHAR lpszMsg[100];
-	RECT rc;
+	TCHAR lpszMsg[255];
 	LPSTATE lpState = (LPSTATE)param;
+	int iTempX = lpState->Snake.body[lpState->Snake.iLength - 1][0];
+	int iTempY = lpState->Snake.body[lpState->Snake.iLength - 1][1];
+	HANDLE hMutex = OpenMutex(SYNCHRONIZE, FALSE, TEXT("SnakeMutex"));
 
 	while (TRUE)
 	{
 		Sleep(100);
-		HANDLE hMutex = OpenMutex(SYNCHRONIZE, FALSE, TEXT("SnakeMutex"));
-		int iTempX = lpState->Snake.body[lpState->Snake.iLength - 1][0];
-		int iTempY = lpState->Snake.body[lpState->Snake.iLength - 1][1];
+
 
 		for (int i = lpState->Snake.iLength - 1; i > 0; i--)
 		{
@@ -326,6 +300,23 @@ DWORD ThreadSnakeMove(LPVOID param)
 			break;
 		}
 
+		// If Snake Head is on the Snake Body
+		for (int i = 1; i < lpState->Snake.iLength; i++)
+		{
+			if (lpState->Snake.body[0][0] == lpState->Snake.body[i][0] &&
+				lpState->Snake.body[0][1] == lpState->Snake.body[i][1])
+			{
+				wsprintf(lpszMsg, TEXT("Score: %d \nTry Again?"), lpState->iScore);
+				iResult = MessageBox(lpState->hwnd, lpszMsg, TEXT("SnAkE!"), MB_YESNO );
+				if (iResult == IDYES) {
+					ResetGame(lpState);
+				}
+				else {
+					SendMessage(lpState->hwnd, WM_CLOSE, 0, 0);
+				}
+			}
+		}
+
 		// If Snake head is on the food
 		if (lpState->Food.iX == lpState->Snake.body[0][0] && lpState->Food.iY == lpState->Snake.body[0][1])
 		{
@@ -333,49 +324,15 @@ DWORD ThreadSnakeMove(LPVOID param)
 			lpState->Snake.body[lpState->Snake.iLength][1] = iTempY;
 			lpState->Snake.iLength++;
 			lpState->iScore += 10;
-
-			if (lpState->iScore == 100)
-			{
-				iResult = MessageBox(lpState->hwnd, TEXT("You Win!!\nPlay Again?"), TEXT("SnAkE!"), MB_YESNO);
-				switch (iResult)
-				{
-				case IDYES:
-					ResetGame(lpState);
-					break;
-
-				case IDNO:
-					SendMessage(lpState->hwnd, WM_CLOSE, 0, 0);
-					break;
-				}
-			}
-
 			lpState->Food.iX = (double)rand() / (RAND_MAX + 1) * (SIZE);
 			lpState->Food.iY = (double)rand() / (RAND_MAX + 1) * (SIZE);
 		}
-		else
-		{
-			// If Snake Head is on the Snake Body
-			for (int i = 1; i < lpState->Snake.iLength; i++)
-			{
-				if (lpState->Snake.body[0][0] == lpState->Snake.body[i][0] &&
-					lpState->Snake.body[0][1] == lpState->Snake.body[i][1])
-				{
-					wsprintf(lpszMsg, TEXT("Score: %d \nTry Again?"), lpState->iScore);
-					iResult = MessageBox(lpState->hwnd, lpszMsg, TEXT("SnAkE!"), MB_YESNO);
-					if (iResult == IDYES) {
-						ResetGame(lpState);
-					}
-					else {
-						SendMessage(lpState->hwnd, WM_CLOSE, 0, 0);
-					}
-				}
-			}
-		}
-
 		ReleaseMutex(hMutex);
 
-		GetClientRect(lpState->hwnd, &rc);
-		InvalidateRect(lpState->hwnd, &rc, TRUE);
+		HWND hwnd = lpState->hwnd;
+		RECT rc;
+		GetClientRect(hwnd, &rc);
+		InvalidateRect(hwnd, &rc, TRUE);
 	}
 	return(0);
 }
