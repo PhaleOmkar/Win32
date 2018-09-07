@@ -1,5 +1,13 @@
 // Headers
 #include <Windows.h>
+#include <stdio.h>
+#include <math.h>
+
+#define PI 3.14159265358979323846
+
+#define XAXIS 1
+#define YAXIS 2
+#define ZAXIS 4
 
 // Types
 typedef struct tagPOINTEX {
@@ -9,8 +17,8 @@ typedef struct tagPOINTEX {
 } POINTEX, *LPPOINTEX;
 
 typedef struct tagLINE {
-	POINTEX ptStart;
-	POINTEX ptEnd;
+	LPPOINTEX ptStart;
+	LPPOINTEX ptEnd;
 } LINE, *LPLINE;
 
 typedef struct tagCAMERA {
@@ -25,13 +33,18 @@ typedef struct tagMODEL {
 } MODEL, *LPMODEL;
 
 typedef struct tagSTATE {
+	int Offset[2];
+	int Origin[2];
 	HWND hwnd;
 	MODEL Model;
 	CAMERA Camera;
+	POINTEX Points[100];
 } STATE, *LPSTATE;
 
 // Prototypes
 LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
+void Rotate(LPSTATE, int, UINT);
+DWORD ThreadMove(LPVOID);
 
 // WinMain
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszCmdLine, int iCmdShow)
@@ -96,9 +109,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszCmdLi
 LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
 {
 	static STATE State;
-	static int Offset[2] = { 0, 0 };
-	static int Origin[2] = { 0, 0 };
-
 	int iResult;
 
 	RECT rc;
@@ -106,8 +116,9 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
 	HDC hdc;
 	POINT arrPoints[50];
 	HPEN hPen;
-	POINTEX ptA, ptB, ptC, ptD, ptE, ptF, ptG, ptH;
-
+	TCHAR lpszDebugInfo[512];
+	static POINTEX ptA, ptB, ptC, ptD, ptE, ptF, ptG, ptH;
+	static HANDLE hThreadMove;
 
 	switch (iMsg)
 	{
@@ -116,54 +127,69 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
 		// Initialize the State
 		State.hwnd = hwnd;
 
-		State.Camera = { 0, 0, 0 };
+		State.Camera = { 1, 1, 1};
+		State.Offset[0] = 0;
+		State.Offset[1] = 0;
+		State.Origin[0] = 0;
+		State.Origin[1] = 0;
 
-		ptA = { 0, 0, 0 };
-		ptB = { 0, 0, 1 };
-		ptC = { 0, 1, 0 };
-		ptD = { 0, 1, 1 };
-		ptE = { 1, 0, 0 };
-		ptF = { 1, 0, 1 };
-		ptG = { 1, 1, 0 };
-		ptH = { 1, 1, 1 };
+		ptA = { -1, -1, -1 };
+		ptB = { -1, -1,  1 };
+		ptC = { -2,  1, -2 };
+		ptD = { -2,  1,  2 };
+		ptE = {  1, -1, -1 };
+		ptF = {  1, -1,  1 };
+		ptG = {  2,  1, -2 };
+		ptH = {  2,  1,  2 };
 
-		State.Model.arrLine[0].ptStart = ptA;
-		State.Model.arrLine[0].ptEnd = ptB;
+		State.Points[0] = ptA;
+		State.Points[1] = ptB;
+		State.Points[2] = ptC;
+		State.Points[3] = ptD;
+		State.Points[4] = ptE;
+		State.Points[5] = ptF;
+		State.Points[6] = ptG;
+		State.Points[7] = ptH;
 
-		State.Model.arrLine[1].ptStart = ptB;
-		State.Model.arrLine[1].ptEnd = ptF;
+		State.Model.arrLine[0].ptStart = &State.Points[0];
+		State.Model.arrLine[0].ptEnd = &State.Points[1];
 
-		State.Model.arrLine[2].ptStart = ptF;
-		State.Model.arrLine[2].ptEnd = ptE;
+		State.Model.arrLine[1].ptStart = &State.Points[1];
+		State.Model.arrLine[1].ptEnd = &State.Points[5];
 
-		State.Model.arrLine[3].ptStart = ptE;
-		State.Model.arrLine[3].ptEnd = ptA;
+		State.Model.arrLine[2].ptStart = &State.Points[5];
+		State.Model.arrLine[2].ptEnd = &State.Points[4];
 
-		State.Model.arrLine[4].ptStart = ptC;
-		State.Model.arrLine[4].ptEnd = ptD;
+		State.Model.arrLine[3].ptStart = &State.Points[4];
+		State.Model.arrLine[3].ptEnd = &State.Points[0];
 
-		State.Model.arrLine[5].ptStart = ptD;
-		State.Model.arrLine[5].ptEnd = ptH;
+		State.Model.arrLine[4].ptStart = &State.Points[2];
+		State.Model.arrLine[4].ptEnd = &State.Points[3];
 
-		State.Model.arrLine[6].ptStart = ptH;
-		State.Model.arrLine[6].ptEnd = ptG;
+		State.Model.arrLine[5].ptStart = &State.Points[3];
+		State.Model.arrLine[5].ptEnd = &State.Points[7];
 
-		State.Model.arrLine[7].ptStart = ptG;
-		State.Model.arrLine[7].ptEnd = ptC;
+		State.Model.arrLine[6].ptStart = &State.Points[7];
+		State.Model.arrLine[6].ptEnd = &State.Points[6];
 
-		State.Model.arrLine[8].ptStart = ptC;
-		State.Model.arrLine[8].ptEnd = ptA;
+		State.Model.arrLine[7].ptStart = &State.Points[6];
+		State.Model.arrLine[7].ptEnd = &State.Points[2];
 
-		State.Model.arrLine[9].ptStart = ptD;
-		State.Model.arrLine[9].ptEnd = ptB;
+		State.Model.arrLine[8].ptStart = &State.Points[2];
+		State.Model.arrLine[8].ptEnd = &State.Points[0];
 
-		State.Model.arrLine[10].ptStart = ptH;
-		State.Model.arrLine[10].ptEnd = ptF;
+		State.Model.arrLine[9].ptStart = &State.Points[3];
+		State.Model.arrLine[9].ptEnd = &State.Points[1];
 
-		State.Model.arrLine[11].ptStart = ptG;
-		State.Model.arrLine[11].ptEnd = ptE;
+		State.Model.arrLine[10].ptStart = &State.Points[7];
+		State.Model.arrLine[10].ptEnd = &State.Points[5];
+
+		State.Model.arrLine[11].ptStart = &State.Points[6];
+		State.Model.arrLine[11].ptEnd = &State.Points[4];
 
 		State.Model.iNoOfLines = 12;
+
+		hThreadMove = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)ThreadMove, (LPVOID)&State, 0, NULL);
 		break;
 
 	case WM_PAINT:
@@ -177,22 +203,22 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
 		SelectObject(hdc, hPen);
 
 		// Find Origin
-		Origin[0] = (rc.right / 2) + Offset[0];
-		Origin[1] = (rc.bottom / 2) + Offset[1];
+		State.Origin[0] = (rc.right / 2) + State.Offset[0];
+		State.Origin[1] = (rc.bottom / 2) + State.Offset[1];
 
-		// x-axis
-		arrPoints[0].x = 0;
-		arrPoints[0].y = (rc.bottom / 2) + Offset[1];
-		arrPoints[1].x = rc.right;
-		arrPoints[1].y = (rc.bottom / 2) + Offset[1];
-		Polyline(hdc, arrPoints, 2);
+		//// x-axis
+		//arrPoints[0].x = 0;
+		//arrPoints[0].y = (rc.bottom / 2) + State.Offset[1];
+		//arrPoints[1].x = rc.right;
+		//arrPoints[1].y = (rc.bottom / 2) + State.Offset[1];
+		//Polyline(hdc, arrPoints, 2);
 
-		// y-axis
-		arrPoints[0].x = (rc.right / 2) + Offset[0];
-		arrPoints[0].y = 0 ;
-		arrPoints[1].x = (rc.right / 2) + Offset[0];
-		arrPoints[1].y = rc.bottom;
-		Polyline(hdc, arrPoints, 2);
+		//// y-axis
+		//arrPoints[0].x = (rc.right / 2) + State.Offset[0];
+		//arrPoints[0].y = 0 ;
+		//arrPoints[1].x = (rc.right / 2) + State.Offset[0];
+		//arrPoints[1].y = rc.bottom;
+		//Polyline(hdc, arrPoints, 2);
 
 		//// z-axis
 		//arrPoints[0].x = (rc.right / 2) + Offset[0];
@@ -204,12 +230,18 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
 		// Draw Object
 		for (int i = 0; i < State.Model.iNoOfLines; i++)
 		{
-			arrPoints[0].x = (100 * State.Model.arrLine[i].ptStart.x) + Origin[0];
-			arrPoints[0].y = (100 * State.Model.arrLine[i].ptStart.z) + Origin[1];
-			arrPoints[1].x = (100 * State.Model.arrLine[i].ptEnd.x) + Origin[0];
-			arrPoints[1].y = (100 * State.Model.arrLine[i].ptEnd.z) + Origin[1];
+			arrPoints[0].x = (100 * State.Model.arrLine[i].ptStart->x) + State.Origin[0];
+			arrPoints[0].y = (100 * State.Model.arrLine[i].ptStart->z) + State.Origin[1];
+			arrPoints[1].x = (100 * State.Model.arrLine[i].ptEnd->x) + State.Origin[0];
+			arrPoints[1].y = (100 * State.Model.arrLine[i].ptEnd->z) + State.Origin[1];
 			Polyline(hdc, arrPoints, 2);
 		}
+
+		// Draw Debug Info
+		SetBkColor(hdc, RGB(0, 0, 0));
+		SetTextColor(hdc, RGB(255, 255, 255));
+		sprintf_s(lpszDebugInfo, "Angles:\n\tX: %d\n\tY: %d\n\tZ: %d", State.Camera.xAngle, State.Camera.yAngle, State.Camera.zAngle);
+		DrawText(hdc, lpszDebugInfo, -1, &rc, DT_TOP | DT_LEFT);
 
 		EndPaint(hwnd, &ps);
 		break;
@@ -218,71 +250,51 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
 
 		switch (wParam)
 		{
-		case 'X':
-			ptA = { 0, 0, 0 };
-			ptB = { 0.853553391, -0.146446609, 0.5 };
-			ptC = { -0.146446609, 0.85355, 0.5 };
-			ptD = { 0.70711, 0.70711, 1 };
-			ptE = { 0.5, 0.5, -0.7071 };
-			ptF = { 1.35355,0.35355,-0.2071 };
-			ptG = { 0.35355, 1.35355,-0.2071 };
-			ptH = { 1.20711, 1.20711,0.29289 };
-
-			State.Model.arrLine[0].ptStart = ptA;
-			State.Model.arrLine[0].ptEnd = ptB;
-
-			State.Model.arrLine[1].ptStart = ptB;
-			State.Model.arrLine[1].ptEnd = ptF;
-
-			State.Model.arrLine[2].ptStart = ptF;
-			State.Model.arrLine[2].ptEnd = ptE;
-
-			State.Model.arrLine[3].ptStart = ptE;
-			State.Model.arrLine[3].ptEnd = ptA;
-
-			State.Model.arrLine[4].ptStart = ptC;
-			State.Model.arrLine[4].ptEnd = ptD;
-
-			State.Model.arrLine[5].ptStart = ptD;
-			State.Model.arrLine[5].ptEnd = ptH;
-
-			State.Model.arrLine[6].ptStart = ptH;
-			State.Model.arrLine[6].ptEnd = ptG;
-
-			State.Model.arrLine[7].ptStart = ptG;
-			State.Model.arrLine[7].ptEnd = ptC;
-
-			State.Model.arrLine[8].ptStart = ptC;
-			State.Model.arrLine[8].ptEnd = ptA;
-
-			State.Model.arrLine[9].ptStart = ptD;
-			State.Model.arrLine[9].ptEnd = ptB;
-
-			State.Model.arrLine[10].ptStart = ptH;
-			State.Model.arrLine[10].ptEnd = ptF;
-
-			State.Model.arrLine[11].ptStart = ptG;
-			State.Model.arrLine[11].ptEnd = ptE;
-			break;
-
+		
 		case 'R':
-			Offset[0] = Offset[1] = 0;
+			State.Offset[0] = State.Offset[1] = 0;
+			State.Camera.xAngle = 1;
+			State.Camera.yAngle = 1;
+			State.Camera.zAngle = 1;
+			Rotate(&State, 8, XAXIS);
+			Rotate(&State, 8, YAXIS);
+			Rotate(&State, 8, ZAXIS);
 			break;
 
 		case VK_UP:
-			Offset[1]--;
+			// Rotate along X-Axis
+			State.Camera.xAngle = 1;
+			Rotate(&State, 8, XAXIS);
 			break;
 
 		case VK_DOWN:
-			Offset[1]++;
+			// Rotate along X-Axis Negative
+			State.Camera.xAngle = -1;
+			Rotate(&State, 8, XAXIS);
 			break;
 
 		case VK_LEFT:
-			Offset[0]--;
+			// Rotate along Y-Axis 
+			State.Camera.yAngle = 1;
+			Rotate(&State, 8, YAXIS);
 			break;
 
 		case VK_RIGHT:
-			Offset[0]++;
+			// Rotate along Y-Axis Negative
+			State.Camera.yAngle = - 1;
+			Rotate(&State, 8, YAXIS);
+			break;
+
+		case 'Q':
+			// Rotate along Z-Axis
+			State.Camera.zAngle = 1;
+			Rotate(&State, 8, ZAXIS);
+			break;
+
+		case 'A':
+			// Rotate along Z-Axis Negative
+			State.Camera.zAngle = - 1;
+			Rotate(&State, 8, ZAXIS);
 			break;
 
 		case VK_ESCAPE:
@@ -301,4 +313,101 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
 	}
 
 	return(DefWindowProc(hwnd, iMsg, wParam, lParam));
+}
+
+void Rotate(LPSTATE State, int iNoOfPoints, UINT iAxis)
+{
+	double dRotationMatrix[3][3];
+	double dSin = 0;
+	double dCos = 0;
+	double dTmp[3];
+
+	switch (iAxis)
+	{
+
+	case XAXIS:
+		dSin = sin(State->Camera.xAngle * PI / 180);
+		dCos = cos(State->Camera.xAngle * PI / 180);
+
+		dRotationMatrix[0][0] = 1;
+		dRotationMatrix[0][1] = 0;
+		dRotationMatrix[0][2] = 0;
+
+		dRotationMatrix[1][0] = 0;
+		dRotationMatrix[1][1] = dCos;
+		dRotationMatrix[1][2] = -dSin;
+
+		dRotationMatrix[2][0] = 0;
+		dRotationMatrix[2][1] = dSin;
+		dRotationMatrix[2][2] = dCos;
+
+		break;
+
+	case YAXIS:
+		dSin = sin(State->Camera.yAngle * PI / 180);
+		dCos = cos(State->Camera.yAngle * PI / 180);
+
+		dRotationMatrix[0][0] = dCos;
+		dRotationMatrix[0][1] = 0;
+		dRotationMatrix[0][2] = dSin;
+
+		dRotationMatrix[1][0] = 0;
+		dRotationMatrix[1][1] = 1;
+		dRotationMatrix[1][2] = 0;
+
+		dRotationMatrix[2][0] = -dSin;
+		dRotationMatrix[2][1] = 0;
+		dRotationMatrix[2][2] = dCos;
+
+		break;
+
+	case ZAXIS:
+		dSin = sin(State->Camera.zAngle * PI / 180);
+		dCos = cos(State->Camera.zAngle * PI / 180);
+
+		dRotationMatrix[0][0] = dCos;
+		dRotationMatrix[0][1] = -dSin;
+		dRotationMatrix[0][2] = 0;
+
+		dRotationMatrix[1][0] = dSin;
+		dRotationMatrix[1][1] = dCos;
+		dRotationMatrix[1][2] = 0;
+
+		dRotationMatrix[2][0] = 0;
+		dRotationMatrix[2][1] = 0;
+		dRotationMatrix[2][2] = 1;
+
+		break;
+
+	}
+
+	for (int i = 0; i < iNoOfPoints; i++)
+	{
+		dTmp[0] = (dRotationMatrix[0][0] * State->Points[i].x) + (dRotationMatrix[0][1] * State->Points[i].y) + (dRotationMatrix[0][2] * State->Points[i].z);
+		dTmp[1] = (dRotationMatrix[1][0] * State->Points[i].x) + (dRotationMatrix[1][1] * State->Points[i].y) + (dRotationMatrix[1][2] * State->Points[i].z);
+		dTmp[2] = (dRotationMatrix[2][0] * State->Points[i].x) + (dRotationMatrix[2][1] * State->Points[i].y) + (dRotationMatrix[2][2] * State->Points[i].z);
+		
+		State->Points[i].x = dTmp[0];
+		State->Points[i].y = dTmp[1];
+		State->Points[i].z = dTmp[2];
+	}
+
+}
+
+DWORD ThreadMove(LPVOID State)
+{
+	RECT rc;
+	LPSTATE lpState = (LPSTATE)State;
+
+	while (TRUE)
+	{
+		Rotate(lpState, 8, XAXIS);
+		Rotate(lpState, 8, YAXIS);
+		Rotate(lpState, 8, ZAXIS);
+		GetClientRect(lpState->hwnd, &rc);
+		InvalidateRect(lpState->hwnd, &rc, TRUE);
+		Sleep(100);
+	}
+
+	return 0;
 }
