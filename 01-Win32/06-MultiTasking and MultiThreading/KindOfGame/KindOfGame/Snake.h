@@ -1,5 +1,7 @@
 // Resources
 #define MYICON 101
+#define EAT	   102
+#define DIE	   103
 
 // Directions
 #define DIR_UP 0

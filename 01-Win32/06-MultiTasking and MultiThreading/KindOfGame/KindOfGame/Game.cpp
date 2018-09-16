@@ -3,6 +3,8 @@
 #include <time.h>
 #include "Snake.h"
 
+#pragma comment (lib, "Winmm.lib")
+
 // Structs
 typedef struct tagCOLORS {
 	int iR;
@@ -273,7 +275,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
 	return(DefWindowProc(hwnd, iMsg, wParam, lParam));
 }
 
-//// Thread Procs
+// Thread Procs
 DWORD ThreadSnakeMove(LPVOID param)
 {
 	int iResult;
@@ -329,6 +331,10 @@ DWORD ThreadSnakeMove(LPVOID param)
 		// If Snake head is on the food
 		if (lpState->Food.iX == lpState->Snake.body[0][0] && lpState->Food.iY == lpState->Snake.body[0][1])
 		{
+			// play Eating sound
+			PlaySound(MAKEINTRESOURCE(EAT), GetModuleHandle(NULL), SND_RESOURCE | SND_ASYNC);
+
+			// calculate score
 			lpState->Snake.body[lpState->Snake.iLength][0] = iTempX;
 			lpState->Snake.body[lpState->Snake.iLength][1] = iTempY;
 			lpState->Snake.iLength++;
@@ -336,7 +342,7 @@ DWORD ThreadSnakeMove(LPVOID param)
 
 			if (lpState->iScore == 100)
 			{
-				iResult = MessageBox(lpState->hwnd, TEXT("You Win!!\nPlay Again?"), TEXT("SnAkE!"), MB_YESNO);
+				iResult = MessageBox(lpState->hwnd, TEXT("You Win!!\nPlay Again?"), TEXT("SnAkE!"), MB_YESNO | MB_ICONASTERISK);
 				switch (iResult)
 				{
 				case IDYES:
@@ -360,8 +366,11 @@ DWORD ThreadSnakeMove(LPVOID param)
 				if (lpState->Snake.body[0][0] == lpState->Snake.body[i][0] &&
 					lpState->Snake.body[0][1] == lpState->Snake.body[i][1])
 				{
+					// Play Die sound
+					PlaySound(MAKEINTRESOURCE(DIE), GetModuleHandle(NULL), SND_RESOURCE | SND_ASYNC);
+
 					wsprintf(lpszMsg, TEXT("Score: %d \nTry Again?"), lpState->iScore);
-					iResult = MessageBox(lpState->hwnd, lpszMsg, TEXT("SnAkE!"), MB_YESNO);
+					iResult = MessageBox(lpState->hwnd, lpszMsg, TEXT("SnAkE!"), MB_YESNO | MB_ICONQUESTION);
 					if (iResult == IDYES) {
 						ResetGame(lpState);
 					}

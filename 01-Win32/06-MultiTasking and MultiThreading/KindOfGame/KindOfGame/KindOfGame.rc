@@ -1,2 +1,4 @@
 #include "Snake.h"
-MYICON ICON Snake.ico
+MYICON  ICON Snake.ico
+EAT		WAVE eat.wav
+DIE		WAVE die.wav

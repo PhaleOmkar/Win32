@@ -1,7 +1,6 @@
 // RESOURCES
 #define MYICON 100
 
-
 // Constants
 #define PI 3.14159265358979323846
 
