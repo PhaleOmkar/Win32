@@ -130,7 +130,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
 		pISubtract = NULL;
 
 		// display the result
-		wsprintf(str, TEXT("Subtraction of %d and %d = %d"), iNum1, iNum2, &iSum);
+		wsprintf(str, TEXT("Subtraction of %d and %d = %d"), iNum1, iNum2, iSum);
 		MessageBox(hwnd, str, TEXT("Result"), MB_OK);
 
 		// exit the application
