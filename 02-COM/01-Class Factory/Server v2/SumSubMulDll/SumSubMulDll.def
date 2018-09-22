@@ -1,0 +1,4 @@
+LIBRARY SumSubMulDll
+EXPORTS
+	DllGetClassObject PRIVATE
+	DllCanUnloadNow   PRIVATE
