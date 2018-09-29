@@ -15,6 +15,9 @@ void ThreeCubes(LPSTATE);
 void FiveAngleStar(LPSTATE);
 void Pyramid(LPSTATE);
 void Diamon(LPSTATE);
+void LetterZ(LPSTATE);
+
+void ConvertToLines(int , int *, LPSTATE);
 
 // WinMain
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszCmdLine, int iCmdShow)
@@ -88,6 +91,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
 	HPEN hPen;
 	TCHAR lpszDebugInfo[512];
 	static HANDLE hThreadMove;
+	int matGraph[8][8] = { 0 };
 
 	switch (iMsg)
 	{
@@ -95,7 +99,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
 
 		// Initialize the State
 		State.hwnd = hwnd;
-		State.Camera = { 0, 0, 0, 40};
+		State.Camera = { 0, 0, 0, 40 };
 		State.iAnimate = 0;
 		State.Directions[0] = 1;
 		State.Directions[1] = 1;
@@ -105,9 +109,22 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
 		State.Origin[0] = 0;
 		State.Origin[1] = 0;
 
-		Cube(&State);
+		//Cube(&State);
 		//ThreeCubes(&State);
 		//FiveAngleStar(&State);
+
+		// DIRTY IMPLIMENTATION
+		matGraph[0][1] = 1;
+		matGraph[2][3] = 1;
+		matGraph[0][2] = 1;
+		matGraph[3][6] = 1;
+		matGraph[1][4] = 1;
+		matGraph[4][5] = 1;
+		matGraph[6][7] = 1;
+		matGraph[5][7] = 1;		
+		ConvertToLines(8, (int *)&matGraph, &State);
+
+		// DIRTY
 
 		hThreadMove = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)ThreadMove, (LPVOID)&State, CREATE_SUSPENDED, NULL);
 		break;
@@ -151,17 +168,17 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
 		for (int i = 0; i < State.Model.iNoOfLines; i++)
 		{
 			arrPoints[0].x = (State.Camera.iScale * State.Model.arrLine[i].ptStart->x) + State.Origin[0];
-			arrPoints[0].y = (State.Camera.iScale * State.Model.arrLine[i].ptStart->y) + State.Origin[1];
+			arrPoints[0].y = -(State.Camera.iScale * State.Model.arrLine[i].ptStart->y) + State.Origin[1];
 			arrPoints[1].x = (State.Camera.iScale * State.Model.arrLine[i].ptEnd->x) + State.Origin[0];
-			arrPoints[1].y = (State.Camera.iScale * State.Model.arrLine[i].ptEnd->y) + State.Origin[1];
+			arrPoints[1].y = -(State.Camera.iScale * State.Model.arrLine[i].ptEnd->y) + State.Origin[1];
 			Polyline(hdc, arrPoints, 2);
 		}
 
 		// Draw Debug Info
 		SetBkColor(hdc, RGB(0, 0, 0));
 		SetTextColor(hdc, RGB(255, 255, 255));
-		sprintf_s(lpszDebugInfo, "Angles:\n\tX: %d\n\tY: %d\n\tZ: %d\n\nDirections:\n\tX: %d\n\tY: %d\n\tZ: %d", State.Camera.xAngle, State.Camera.yAngle, State.Camera.zAngle, 
-		  State.Directions[0], State.Directions[1], State.Directions[2]);
+		sprintf_s(lpszDebugInfo, "Angles:\n\tX: %d\n\tY: %d\n\tZ: %d\n\nDirections:\n\tX: %d\n\tY: %d\n\tZ: %d", State.Camera.xAngle, State.Camera.yAngle, State.Camera.zAngle,
+			State.Directions[0], State.Directions[1], State.Directions[2]);
 		DrawText(hdc, lpszDebugInfo, -1, &rc, DT_TOP | DT_LEFT);
 
 		EndPaint(hwnd, &ps);
@@ -182,13 +199,17 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
 		case '3':
 			Pyramid(&State);
 			break;
-		
+
 		case '4':
 			Diamon(&State);
 			break;
-		
+				
 		case '5':
 			FiveAngleStar(&State);
+			break;
+
+		case '6':
+			LetterZ(&State);
 			break;
 
 		case 'I':
@@ -196,7 +217,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
 			break;
 
 		case 'O':
-			if(State.Camera.iScale > 2)
+			if (State.Camera.iScale > 2)
 				State.Camera.iScale -= 2;
 			break;
 
@@ -211,21 +232,21 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
 				SuspendThread(hThreadMove);
 			}
 			break;
-		
+
 		case 'R':
 			State.Offset[0] = State.Offset[1] = 0;
 			State.Camera.iScale = 40;
 
-			State.Directions[0] = - State.Camera.xAngle;
-			State.Directions[1] = - State.Camera.yAngle;
-			State.Directions[2] = - State.Camera.zAngle;
-			
+			State.Directions[0] = -State.Camera.xAngle;
+			State.Directions[1] = -State.Camera.yAngle;
+			State.Directions[2] = -State.Camera.zAngle;
+
 			Rotate(&State, XAXIS);
 			Rotate(&State, YAXIS);
 			Rotate(&State, ZAXIS);
-			
+
 			ResetCamera(&State);
-			
+
 			break;
 
 		case VK_UP:
@@ -284,7 +305,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
 
 void Rotate(LPSTATE State, UINT iAxis)
 {
-	double dRotationMatrix[3][3];	
+	double dRotationMatrix[3][3];
 	double dSin = 0;
 	double dCos = 0;
 	double dTmp[3];
@@ -363,7 +384,7 @@ void Rotate(LPSTATE State, UINT iAxis)
 		break;
 
 	case ZAXIS:
-		
+
 		// Adjust Camera Angle
 		if (State->Directions[2] == 1)
 		{
@@ -399,12 +420,12 @@ void Rotate(LPSTATE State, UINT iAxis)
 
 	}
 
-	for (int i = 0; i < State->Model.iNoOfPoints ; i++)
+	for (int i = 0; i < State->Model.iNoOfPoints; i++)
 	{
 		dTmp[0] = (dRotationMatrix[0][0] * State->Points[i].x) + (dRotationMatrix[0][1] * State->Points[i].y) + (dRotationMatrix[0][2] * State->Points[i].z);
 		dTmp[1] = (dRotationMatrix[1][0] * State->Points[i].x) + (dRotationMatrix[1][1] * State->Points[i].y) + (dRotationMatrix[1][2] * State->Points[i].z);
 		dTmp[2] = (dRotationMatrix[2][0] * State->Points[i].x) + (dRotationMatrix[2][1] * State->Points[i].y) + (dRotationMatrix[2][2] * State->Points[i].z);
-		
+
 		State->Points[i].x = dTmp[0];
 		State->Points[i].y = dTmp[1];
 		State->Points[i].z = dTmp[2];
@@ -445,10 +466,10 @@ void Cube(LPSTATE State)
 {
 	ResetCamera(State);
 
-	State->Points[0] = POINTEX({ -1, -1, -1});
-	State->Points[1] = POINTEX({ -1, -1,  1});
-	State->Points[2] = POINTEX({ -1,  1, -1});
-	State->Points[3] = POINTEX({ -1,  1,  1});
+	State->Points[0] = POINTEX({ -1, -1, -1 });
+	State->Points[1] = POINTEX({ -1, -1,  1 });
+	State->Points[2] = POINTEX({ -1,  1, -1 });
+	State->Points[3] = POINTEX({ -1,  1,  1 });
 	State->Points[4] = POINTEX({ 1, -1, -1 });
 	State->Points[5] = POINTEX({ 1, -1,  1 });
 	State->Points[6] = POINTEX({ 1,  1, -1 });
@@ -504,39 +525,39 @@ void ThreeCubes(LPSTATE State)
 		switch (i)
 		{
 		case 0:
-			ptA = { -1, -1, -1};
-			ptB = { -1, -1,  1};
-			ptC = { -1,  1, -1};
-			ptD = { -1,  1,  1};
-			ptE = {  1, -1, -1};
-			ptF = {  1, -1,  1};
-			ptG = {  1,  1, -1};
-			ptH = {  1,  1,  1};
+			ptA = { -1, -1, -1 };
+			ptB = { -1, -1,  1 };
+			ptC = { -1,  1, -1 };
+			ptD = { -1,  1,  1 };
+			ptE = { 1, -1, -1 };
+			ptF = { 1, -1,  1 };
+			ptG = { 1,  1, -1 };
+			ptH = { 1,  1,  1 };
 			break;
 
 		case 1:
-			ptA = { -1 +2, -1 +2, -1+2 };
-			ptB = { -1 +2, -1 +2,  1+2 };
-			ptC = { -1 +2,  1 +2, -1+2 };
-			ptD = { -1 +2,  1 +2,  1+2 };	
-			ptE = {  1 +2, -1 +2, -1+2 };
-			ptF = {  1 +2, -1 +2,  1+2 };
-			ptG = {  1 +2,  1 +2, -1+2 };
-			ptH = {  1 +2,  1 +2,  1+2 };
+			ptA = { -1 + 2, -1 + 2, -1 + 2 };
+			ptB = { -1 + 2, -1 + 2,  1 + 2 };
+			ptC = { -1 + 2,  1 + 2, -1 + 2 };
+			ptD = { -1 + 2,  1 + 2,  1 + 2 };
+			ptE = { 1 + 2, -1 + 2, -1 + 2 };
+			ptF = { 1 + 2, -1 + 2,  1 + 2 };
+			ptG = { 1 + 2,  1 + 2, -1 + 2 };
+			ptH = { 1 + 2,  1 + 2,  1 + 2 };
 			break;
 
 		case 2:
-			ptA = { -1 -2, -1 -2, -1- 2 };
-			ptB = { -1 -2, -1 -2,  1- 2 };
-			ptC = { -1 -2,  1 -2, -1- 2 };
-			ptD = { -1 -2,  1 -2,  1- 2 };
-			ptE = {  1 -2, -1 -2, -1- 2 };
-			ptF = {  1 -2, -1 -2,  1- 2 };
-			ptG = {  1 -2,  1 -2, -1- 2 };
-			ptH = {  1 -2,  1 -2,  1- 2 };
+			ptA = { -1 - 2, -1 - 2, -1 - 2 };
+			ptB = { -1 - 2, -1 - 2,  1 - 2 };
+			ptC = { -1 - 2,  1 - 2, -1 - 2 };
+			ptD = { -1 - 2,  1 - 2,  1 - 2 };
+			ptE = { 1 - 2, -1 - 2, -1 - 2 };
+			ptF = { 1 - 2, -1 - 2,  1 - 2 };
+			ptG = { 1 - 2,  1 - 2, -1 - 2 };
+			ptH = { 1 - 2,  1 - 2,  1 - 2 };
 			break;
 		}
-		
+
 
 		State->Points[0 + (i * 8)] = ptA;
 		State->Points[1 + (i * 8)] = ptB;
@@ -547,41 +568,41 @@ void ThreeCubes(LPSTATE State)
 		State->Points[6 + (i * 8)] = ptG;
 		State->Points[7 + (i * 8)] = ptH;
 
-		State->Model.arrLine[0 + (i * 12)].ptStart = &State->Points[0 + (i *8)];
-		State->Model.arrLine[0 + (i * 12)].ptEnd = &State->Points[1 + (i *8)];
+		State->Model.arrLine[0 + (i * 12)].ptStart = &State->Points[0 + (i * 8)];
+		State->Model.arrLine[0 + (i * 12)].ptEnd = &State->Points[1 + (i * 8)];
 
-		State->Model.arrLine[1 + (i * 12)].ptStart = &State->Points[1 + (i *8)];
-		State->Model.arrLine[1 + (i * 12)].ptEnd = &State->Points[5 + (i *8)];
-		
-		State->Model.arrLine[2 + (i * 12)].ptStart = &State->Points[5 + (i *8)];
-		State->Model.arrLine[2 + (i * 12)].ptEnd = &State->Points[4 + (i *8)];
-		
-		State->Model.arrLine[3 + (i * 12)].ptStart = &State->Points[4 + (i *8)];
-		State->Model.arrLine[3 + (i * 12)].ptEnd = &State->Points[0 + (i *8)];
-		
-		State->Model.arrLine[4 + (i * 12)].ptStart = &State->Points[2 + (i *8)];
-		State->Model.arrLine[4 + (i * 12)].ptEnd = &State->Points[3 + (i *8)];
-		
-		State->Model.arrLine[5 + (i * 12)].ptStart = &State->Points[3 + (i *8)];
-		State->Model.arrLine[5 + (i * 12)].ptEnd = &State->Points[7 + (i *8)];
-		
-		State->Model.arrLine[6 + (i * 12)].ptStart = &State->Points[7 + (i *8)];
-		State->Model.arrLine[6 + (i * 12)].ptEnd = &State->Points[6 + (i *8)];
-		
-		State->Model.arrLine[7 + (i * 12)].ptStart = &State->Points[6 + (i *8)];
-		State->Model.arrLine[7 + (i * 12)].ptEnd = &State->Points[2 + (i *8)];
-		
-		State->Model.arrLine[8 + (i * 12)].ptStart = &State->Points[2 + (i *8)];
-		State->Model.arrLine[8 + (i * 12)].ptEnd = &State->Points[0 + (i *8)];
-		
-		State->Model.arrLine[9 + (i * 12)].ptStart = &State->Points[3 + (i *8)];
-		State->Model.arrLine[9 + (i * 12)].ptEnd = &State->Points[1 + (i *8)];
-		
-		State->Model.arrLine[10 + (i * 12)].ptStart = &State->Points[7 + (i *8)];
-		State->Model.arrLine[10 + (i * 12)].ptEnd = &State->Points[5 + (i *8)];
+		State->Model.arrLine[1 + (i * 12)].ptStart = &State->Points[1 + (i * 8)];
+		State->Model.arrLine[1 + (i * 12)].ptEnd = &State->Points[5 + (i * 8)];
 
-		State->Model.arrLine[11 + (i * 12)].ptStart = &State->Points[6 + (i *8)];
-		State->Model.arrLine[11 + (i * 12)].ptEnd = &State->Points[4 + (i *8)];
+		State->Model.arrLine[2 + (i * 12)].ptStart = &State->Points[5 + (i * 8)];
+		State->Model.arrLine[2 + (i * 12)].ptEnd = &State->Points[4 + (i * 8)];
+
+		State->Model.arrLine[3 + (i * 12)].ptStart = &State->Points[4 + (i * 8)];
+		State->Model.arrLine[3 + (i * 12)].ptEnd = &State->Points[0 + (i * 8)];
+
+		State->Model.arrLine[4 + (i * 12)].ptStart = &State->Points[2 + (i * 8)];
+		State->Model.arrLine[4 + (i * 12)].ptEnd = &State->Points[3 + (i * 8)];
+
+		State->Model.arrLine[5 + (i * 12)].ptStart = &State->Points[3 + (i * 8)];
+		State->Model.arrLine[5 + (i * 12)].ptEnd = &State->Points[7 + (i * 8)];
+
+		State->Model.arrLine[6 + (i * 12)].ptStart = &State->Points[7 + (i * 8)];
+		State->Model.arrLine[6 + (i * 12)].ptEnd = &State->Points[6 + (i * 8)];
+
+		State->Model.arrLine[7 + (i * 12)].ptStart = &State->Points[6 + (i * 8)];
+		State->Model.arrLine[7 + (i * 12)].ptEnd = &State->Points[2 + (i * 8)];
+
+		State->Model.arrLine[8 + (i * 12)].ptStart = &State->Points[2 + (i * 8)];
+		State->Model.arrLine[8 + (i * 12)].ptEnd = &State->Points[0 + (i * 8)];
+
+		State->Model.arrLine[9 + (i * 12)].ptStart = &State->Points[3 + (i * 8)];
+		State->Model.arrLine[9 + (i * 12)].ptEnd = &State->Points[1 + (i * 8)];
+
+		State->Model.arrLine[10 + (i * 12)].ptStart = &State->Points[7 + (i * 8)];
+		State->Model.arrLine[10 + (i * 12)].ptEnd = &State->Points[5 + (i * 8)];
+
+		State->Model.arrLine[11 + (i * 12)].ptStart = &State->Points[6 + (i * 8)];
+		State->Model.arrLine[11 + (i * 12)].ptEnd = &State->Points[4 + (i * 8)];
 	}
 
 	State->Model.iNoOfPoints = 24;
@@ -592,7 +613,7 @@ void FiveAngleStar(LPSTATE State)
 {
 	ResetCamera(State);
 
-	State->Points[0]  = POINTEX({ 0, 15, 0 });
+	State->Points[0] = POINTEX({ 0, 15, 0 });
 	State->Points[1] = POINTEX({ 15, 5, 0 });
 	State->Points[2] = POINTEX({ 8, -12, 0 });
 	State->Points[3] = POINTEX({ -8, -12, 0 });
@@ -612,7 +633,7 @@ void FiveAngleStar(LPSTATE State)
 
 	State->Points[13] = POINTEX({ -3,5, 3 });
 	State->Points[14] = POINTEX({ -3,5, -3 });
-	
+
 	// Lines From A Point
 	State->Model.arrLine[0].ptStart = &State->Points[0];
 	State->Model.arrLine[0].ptEnd = &State->Points[5];
@@ -820,3 +841,156 @@ void Diamon(LPSTATE State)
 	State->Model.iNoOfPoints = 6;
 	State->Model.iNoOfLines = 12;
 }
+
+void LetterZ(LPSTATE State)
+{
+	ResetCamera(State);
+
+	State->Points[0] = POINTEX({ 0,10,-2 });
+	State->Points[1] = POINTEX({ 10,10,-2 });
+	State->Points[2] = POINTEX({ 0,8,-2 });
+	State->Points[3] = POINTEX({ 6,8,-2 });
+	State->Points[4] = POINTEX({ 6,2,-2 });
+	State->Points[5] = POINTEX({ 10,2,-2 });
+	State->Points[6] = POINTEX({ 0,0,-2 });
+	State->Points[7] = POINTEX({ 10,0,-2 });
+
+	State->Points[8] = POINTEX({ 0,10,2 });
+	State->Points[9] = POINTEX({ 10,10,2 });
+	State->Points[10] = POINTEX({ 0,8,2 });
+	State->Points[11] = POINTEX({ 6,8,2 });
+	State->Points[12] = POINTEX({ 6,2,2 });
+	State->Points[13] = POINTEX({ 10,2,2 });
+	State->Points[14] = POINTEX({ 0,0,2 });
+	State->Points[15] = POINTEX({ 10,0,2 });
+
+	State->Model.arrLine[0].ptStart = &State->Points[0];
+	State->Model.arrLine[0].ptEnd = &State->Points[1];
+	State->Model.arrLine[1].ptStart = &State->Points[0+8];
+	State->Model.arrLine[1].ptEnd = &State->Points[1+8];
+	State->Model.arrLine[2].ptStart = &State->Points[0];
+	State->Model.arrLine[2].ptEnd = &State->Points[0+8];
+	State->Model.arrLine[3].ptStart = &State->Points[1];
+	State->Model.arrLine[3].ptEnd = &State->Points[1+8];
+
+	State->Model.arrLine[4].ptStart = &State->Points[2];
+	State->Model.arrLine[4].ptEnd = &State->Points[3];
+	State->Model.arrLine[5].ptStart = &State->Points[2 + 8];
+	State->Model.arrLine[5].ptEnd = &State->Points[3 + 8];
+	State->Model.arrLine[6].ptStart = &State->Points[2];
+	State->Model.arrLine[6].ptEnd = &State->Points[2 + 8];
+	State->Model.arrLine[7].ptStart = &State->Points[3];
+	State->Model.arrLine[7].ptEnd = &State->Points[3 + 8];
+
+	State->Model.arrLine[8].ptStart = &State->Points[0];
+	State->Model.arrLine[8].ptEnd = &State->Points[2];
+	State->Model.arrLine[9].ptStart = &State->Points[0 + 8];
+	State->Model.arrLine[9].ptEnd = &State->Points[2 + 8];
+	State->Model.arrLine[10].ptStart = &State->Points[0];
+	State->Model.arrLine[10].ptEnd = &State->Points[0 + 8];
+	State->Model.arrLine[11].ptStart = &State->Points[2];
+	State->Model.arrLine[11].ptEnd = &State->Points[2 + 8];
+
+	State->Model.arrLine[12].ptStart = &State->Points[3];
+	State->Model.arrLine[12].ptEnd = &State->Points[6];
+	State->Model.arrLine[13].ptStart = &State->Points[3 + 8];
+	State->Model.arrLine[13].ptEnd = &State->Points[6 + 8];
+	State->Model.arrLine[14].ptStart = &State->Points[3];
+	State->Model.arrLine[14].ptEnd = &State->Points[3 + 8];
+	State->Model.arrLine[15].ptStart = &State->Points[6];
+	State->Model.arrLine[15].ptEnd = &State->Points[6 + 8];
+
+	State->Model.arrLine[16].ptStart = &State->Points[1];
+	State->Model.arrLine[16].ptEnd = &State->Points[4];
+	State->Model.arrLine[17].ptStart = &State->Points[1 + 8];
+	State->Model.arrLine[17].ptEnd = &State->Points[4 + 8];
+	State->Model.arrLine[18].ptStart = &State->Points[1];
+	State->Model.arrLine[18].ptEnd = &State->Points[1 + 8];
+	State->Model.arrLine[19].ptStart = &State->Points[4];
+	State->Model.arrLine[19].ptEnd = &State->Points[4 + 8];
+
+	State->Model.arrLine[20].ptStart = &State->Points[4];
+	State->Model.arrLine[20].ptEnd = &State->Points[5];
+	State->Model.arrLine[21].ptStart = &State->Points[4 + 8];
+	State->Model.arrLine[21].ptEnd = &State->Points[5 + 8];
+	State->Model.arrLine[22].ptStart = &State->Points[4];
+	State->Model.arrLine[22].ptEnd = &State->Points[4 + 8];
+	State->Model.arrLine[23].ptStart = &State->Points[5];
+	State->Model.arrLine[23].ptEnd = &State->Points[5 + 8];
+
+	State->Model.arrLine[24].ptStart = &State->Points[6];
+	State->Model.arrLine[24].ptEnd = &State->Points[7];
+	State->Model.arrLine[25].ptStart = &State->Points[6 + 8];
+	State->Model.arrLine[25].ptEnd = &State->Points[7 + 8];
+	State->Model.arrLine[26].ptStart = &State->Points[6];
+	State->Model.arrLine[26].ptEnd = &State->Points[6 + 8];
+	State->Model.arrLine[27].ptStart = &State->Points[7];
+	State->Model.arrLine[27].ptEnd = &State->Points[7 + 8];
+
+	State->Model.arrLine[28].ptStart = &State->Points[5];
+	State->Model.arrLine[28].ptEnd = &State->Points[7];
+	State->Model.arrLine[29].ptStart = &State->Points[5 + 8];
+	State->Model.arrLine[29].ptEnd = &State->Points[7 + 8];
+	State->Model.arrLine[30].ptStart = &State->Points[5];
+	State->Model.arrLine[30].ptEnd = &State->Points[5 + 8];
+	State->Model.arrLine[31].ptStart = &State->Points[7];
+	State->Model.arrLine[31].ptEnd = &State->Points[7 + 8];
+
+	State->Model.iNoOfLines = 32;
+	State->Model.iNoOfPoints = 16;
+}
+
+void ConvertToLines(int iNoOfPoints, int *matGraph, LPSTATE State)
+{
+
+	// dirty fix
+	State->Points[0] = POINTEX({ 0,10,-2 });
+	State->Points[1] = POINTEX({ 10,10,-2 });
+	State->Points[2] = POINTEX({ 0,8,-2 });
+	State->Points[3] = POINTEX({ 6,8,-2 });
+	State->Points[4] = POINTEX({ 6,2,-2 });
+	State->Points[5] = POINTEX({ 10,2,-2 });
+	State->Points[6] = POINTEX({ 0,0,-2 });
+	State->Points[7] = POINTEX({ 10,0,-2 });
+
+	State->Points[8] = POINTEX({ 0,10,2 });
+	State->Points[9] = POINTEX({ 10,10,2 });
+	State->Points[10] = POINTEX({ 0,8,2 });
+	State->Points[11] = POINTEX({ 6,8,2 });
+	State->Points[12] = POINTEX({ 6,2,2 });
+	State->Points[13] = POINTEX({ 10,2,2 });
+	State->Points[14] = POINTEX({ 0,0,2 });
+	State->Points[15] = POINTEX({ 10,0,2 });
+
+	int iLineNo = 0;
+
+	// for uppper and lower face
+	for(int i = 0 ; i < iNoOfPoints; i++)
+	{
+		for (int j = i+1; j < iNoOfPoints; j++)
+		{
+			if (matGraph[(i*iNoOfPoints) + j] == 1)
+			{
+				// upper face
+				State->Model.arrLine[iLineNo].ptStart = &State->Points[i];
+				State->Model.arrLine[iLineNo++].ptEnd = &State->Points[j];
+
+				// lower face
+				State->Model.arrLine[iLineNo].ptStart = &State->Points[i + iNoOfPoints];
+				State->Model.arrLine[iLineNo++].ptEnd = &State->Points[j + iNoOfPoints];
+			}
+		}
+	}
+
+	// for upper to lower connections
+	for (int i = 0; i < iNoOfPoints; i++)
+	{
+		State->Model.arrLine[iLineNo].ptStart = &State->Points[i];
+		State->Model.arrLine[iLineNo++].ptEnd = &State->Points[i + iNoOfPoints];
+	}
+
+	State->Model.iNoOfLines = iLineNo;
+	State->Model.iNoOfPoints = iNoOfPoints * 2;
+}
+
+

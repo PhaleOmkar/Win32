@@ -20,8 +20,8 @@
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>
-    <ProjectGuid>{7265E9E9-7974-400D-A148-9F689D420CDA}</ProjectGuid>
-    <RootNamespace>UI</RootNamespace>
+    <ProjectGuid>{D5CF966C-7A11-467F-B9FC-955C902F5474}</ProjectGuid>
+    <RootNamespace>ClientOfContainmentComponentWithRegFile</RootNamespace>
     <WindowsTargetPlatformVersion>10.0.17134.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -115,14 +115,10 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Project.cpp" />
+    <ClInclude Include="ClientOfContainmentComponentWithRegFile.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Project.h" />
-    <ClInclude Include="resource.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ResourceCompile Include="Project.rc" />
+    <ClCompile Include="ClientOfContainmentComponentWithRegFile.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
