@@ -24,8 +24,14 @@ BOOL WINAPI DllMain(HINSTANCE hInstance, DWORD dwReason, LPVOID Reserved)
 }
 
 // Exported Functions
-extern "C" double CalculateCentrifugalForce(double dMass, double dVelocity, double dRadius)
+extern "C" double CalculateCentripetalForce(double dMass, double dVelocity, double dRadius)
 {
 	// calculate Centrifugal Force: m * v^2 / r
 	return((dMass * dVelocity * dVelocity) / dRadius);
+}
+
+extern "C" double CalculateCentripetalAcceleration(double dVelocity, double dRadius)
+{
+	// calculate Centripetal Acceleration: v^2 / r
+	return((dVelocity * dVelocity) / dRadius);
 }

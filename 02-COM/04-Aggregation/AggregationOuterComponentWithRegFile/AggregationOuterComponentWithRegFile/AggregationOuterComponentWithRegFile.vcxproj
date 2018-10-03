@@ -20,13 +20,13 @@
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>
-    <ProjectGuid>{7265E9E9-7974-400D-A148-9F689D420CDA}</ProjectGuid>
-    <RootNamespace>UI</RootNamespace>
+    <ProjectGuid>{B95FCDB9-FADE-4DF2-9AA1-AA6C7613242F}</ProjectGuid>
+    <RootNamespace>AggregationOuterComponentWithRegFile</RootNamespace>
     <WindowsTargetPlatformVersion>10.0.17134.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v141</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
@@ -77,6 +77,9 @@
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
     </ClCompile>
+    <Link>
+      <ModuleDefinitionFile>AggregationOuterComponentWithRegFile.def</ModuleDefinitionFile>
+    </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -85,6 +88,9 @@
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
     </ClCompile>
+    <Link>
+      <ModuleDefinitionFile>AggregationOuterComponentWithRegFile.def</ModuleDefinitionFile>
+    </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -98,6 +104,7 @@
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
+      <ModuleDefinitionFile>AggregationOuterComponentWithRegFile.def</ModuleDefinitionFile>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -112,16 +119,18 @@
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
+      <ModuleDefinitionFile>AggregationOuterComponentWithRegFile.def</ModuleDefinitionFile>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Project.cpp" />
+    <ClInclude Include="AggregationInnerComponentWithRegFile.h" />
+    <ClInclude Include="AggregationOuterComponentWithRegFile.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Project.h" />
+    <ClCompile Include="AggregationOuterComponentWithRegFile.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="Project.rc" />
+    <None Include="AggregationOuterComponentWithRegFile.def" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

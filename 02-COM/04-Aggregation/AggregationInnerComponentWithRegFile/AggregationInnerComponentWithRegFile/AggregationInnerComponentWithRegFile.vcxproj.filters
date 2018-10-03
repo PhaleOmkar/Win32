@@ -15,18 +15,18 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Project.cpp">
+    <ClCompile Include="AggregationInnerComponentWithRegFile.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Project.h">
+    <ClInclude Include="AggregationInnerComponentWithRegFile.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="Project.rc">
-      <Filter>Resource Files</Filter>
-    </ResourceCompile>
+    <None Include="AggregationInnerComponentWithRegFile.def">
+      <Filter>Source Files</Filter>
+    </None>
   </ItemGroup>
 </Project>

@@ -1,0 +1,5 @@
+Mass    : 14 kg
+Velocity: 432 m/s
+Radius  : 124 m
+
+Centrifugal Force: -21070.5 N

@@ -1,0 +1,5 @@
+Mass    : 1 kg
+Velocity: 2 m/s
+Radius  : 34 m
+
+Centripetal Force: 0.117647 N

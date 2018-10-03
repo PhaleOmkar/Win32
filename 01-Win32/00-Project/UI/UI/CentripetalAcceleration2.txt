@@ -1,0 +1,4 @@
+Velocity: 2.34123e+06 m/s
+Radius  : 5135 m
+
+Centripetal Acceleration: 1.06745e+09 m/s²

@@ -1,0 +1,4 @@
+Velocity: 234 m/s
+Radius  : 234 m
+
+Centrifugal Force: 234 N
