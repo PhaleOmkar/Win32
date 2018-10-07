@@ -92,7 +92,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
 	HPEN hPen;
 	TCHAR lpszDebugInfo[512];
 	static HANDLE hThreadMove;
-	char szLetters[] = "yy";
+	char szLetters[] = "vwxyz";
 
 	switch (iMsg)
 	{
