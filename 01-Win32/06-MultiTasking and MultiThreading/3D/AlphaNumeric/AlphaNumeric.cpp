@@ -149,6 +149,25 @@ extern "C" void SetLetters(LPSTATE State, char *szLetters)
 			iNoOfPointsToShift = sizeof(arr2DPointsOfD) / sizeof(int);
 			arr2DPoints = (int *)malloc(sizeof(arr2DPointsOfD) * sizeof(int));
 			memcpy(arr2DPoints, arr2DPointsOfD, sizeof(arr2DPointsOfD));
+			
+			matGraphOfLetter[0][1] = 1;
+			matGraphOfLetter[0][2] = 1;
+			matGraphOfLetter[2][3] = 1;
+			matGraphOfLetter[3][11] = 1;
+			matGraphOfLetter[10][11] = 1;
+			matGraphOfLetter[10][14] = 1;
+			matGraphOfLetter[14][15] = 1;
+			matGraphOfLetter[9][15] = 1;
+			matGraphOfLetter[4][12] = 1;
+			matGraphOfLetter[8][13] = 1;
+			matGraphOfLetter[6][8] = 1;
+			matGraphOfLetter[4][5] = 1;
+			matGraphOfLetter[1][7] = 1;
+			matGraphOfLetter[5][6] = 1;
+			matGraphOfLetter[7][9] = 1;
+			matGraphOfLetter[12][13] = 1;
+			matGraph = (int *)matGraphOfLetter;
+
 			break;
 
 		case 'e':
@@ -240,6 +259,28 @@ extern "C" void SetLetters(LPSTATE State, char *szLetters)
 			iNoOfPointsToShift = sizeof(arr2DPointsOfQ) / sizeof(int);
 			arr2DPoints = (int *)malloc(sizeof(arr2DPointsOfQ) * sizeof(int));
 			memcpy(arr2DPoints, arr2DPointsOfQ, sizeof(arr2DPointsOfQ));
+			
+			matGraphOfLetter[0][1] = 1;
+			matGraphOfLetter[1][5] = 1;
+			matGraphOfLetter[5][9] = 1;
+			matGraphOfLetter[9][13] = 1;
+			matGraphOfLetter[13][15] = 1;
+			matGraphOfLetter[15][18] = 1;
+			matGraphOfLetter[14][18] = 1;
+			matGraphOfLetter[14][17] = 1;
+			matGraphOfLetter[16][17] = 1;
+			matGraphOfLetter[10][16] = 1;
+			matGraphOfLetter[2][10] = 1;
+			matGraphOfLetter[0][2] = 1;
+			matGraphOfLetter[3][4] = 1;
+			matGraphOfLetter[4][8] = 1;
+			matGraphOfLetter[6][8] = 1;
+			matGraphOfLetter[6][7] = 1;
+			matGraphOfLetter[7][12] = 1;
+			matGraphOfLetter[11][12] = 1;
+			matGraphOfLetter[3][11] = 1;
+			matGraph = (int *)matGraphOfLetter;
+
 			break;
 
 		case 'r':
