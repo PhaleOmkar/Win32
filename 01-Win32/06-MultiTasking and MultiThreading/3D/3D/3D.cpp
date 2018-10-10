@@ -92,7 +92,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
 	HPEN hPen;
 	TCHAR lpszDebugInfo[512];
 	static HANDLE hThreadMove;
-	char szLetters[] = "qd";
+	char szLetters[] = "abcdefghijklmnopqrstuvwxyz";
 
 	switch (iMsg)
 	{
@@ -259,12 +259,12 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
 			break;
 
 		case 'I':
-			State.Camera.iScale += 2;
+			State.Camera.iScale += 1;
 			break;
 
 		case 'O':
 			if (State.Camera.iScale > 2)
-				State.Camera.iScale -= 2;
+				State.Camera.iScale -= 1;
 			break;
 
 		case VK_SPACE:
