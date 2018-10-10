@@ -92,7 +92,8 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
 	HPEN hPen;
 	TCHAR lpszDebugInfo[512];
 	static HANDLE hThreadMove;
-	char szLetters[] = "abcdefghijklmnopqrstuvwxyz";
+	char szLetters[] = "Quick Brown Fox Jumps Over The Lazy Dog";
+	//char szLetters[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
 	switch (iMsg)
 	{
@@ -184,9 +185,9 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
 		// Draw Object
 		for (int i = 0; i < State.Model.iNoOfLines; i++)
 		{
-			arrPoints[0].x = (State.Camera.iScale * State.Model.arrLine[i].ptStart->x) + State.Origin[0];
+			arrPoints[0].x =  (State.Camera.iScale * State.Model.arrLine[i].ptStart->x) + State.Origin[0];
 			arrPoints[0].y = -(State.Camera.iScale * State.Model.arrLine[i].ptStart->y) + State.Origin[1];
-			arrPoints[1].x = (State.Camera.iScale * State.Model.arrLine[i].ptEnd->x) + State.Origin[0];
+			arrPoints[1].x =  (State.Camera.iScale * State.Model.arrLine[i].ptEnd->x) + State.Origin[0];
 			arrPoints[1].y = -(State.Camera.iScale * State.Model.arrLine[i].ptEnd->y) + State.Origin[1];
 			Polyline(hdc, arrPoints, 2);
 		}
@@ -194,8 +195,10 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
 		// Draw Debug Info
 		SetBkColor(hdc, RGB(0, 0, 0));
 		SetTextColor(hdc, RGB(255, 255, 255));
-		sprintf_s(lpszDebugInfo, "Angles:\n\tX: %d\n\tY: %d\n\tZ: %d\n\nDirections:\n\tX: %d\n\tY: %d\n\tZ: %d", State.Camera.xAngle, State.Camera.yAngle, State.Camera.zAngle,
-			State.Directions[0], State.Directions[1], State.Directions[2]);
+		sprintf_s(lpszDebugInfo, "Angles:\n\tX: %d\n\tY: %d\n\tZ: %d\n\nDirections:\n\tX: %d\n\tY: %d\n\tZ: %d\n\nScale: %d", 
+			State.Camera.xAngle, State.Camera.yAngle, State.Camera.zAngle,
+			State.Directions[0], State.Directions[1], State.Directions[2],
+			State.Camera.iScale);
 		DrawText(hdc, lpszDebugInfo, -1, &rc, DT_TOP | DT_LEFT);
 
 		EndPaint(hwnd, &ps);
@@ -283,13 +286,17 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
 			State.Offset[0] = State.Offset[1] = 0;
 			State.Camera.iScale = 40;
 
-			State.Directions[0] = -State.Camera.xAngle;
+			State.Model.iNoOfLines = 0;
+			State.Model.iNoOfPoints = 0;
+			SetLetters(&State, szLetters);
+
+			/*State.Directions[0] = -State.Camera.xAngle;
 			State.Directions[1] = -State.Camera.yAngle;
 			State.Directions[2] = -State.Camera.zAngle;
 
 			Rotate(&State, XAXIS);
 			Rotate(&State, YAXIS);
-			Rotate(&State, ZAXIS);
+			Rotate(&State, ZAXIS);*/
 
 			ResetCamera(&State);
 
