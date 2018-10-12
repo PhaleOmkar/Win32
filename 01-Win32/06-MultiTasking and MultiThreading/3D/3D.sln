@@ -7,6 +7,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "3D", "3D\3D.vcxproj", "{DE3
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "AlphaNumeric", "AlphaNumeric\AlphaNumeric.vcxproj", "{DAC5523E-D8C5-47DE-858F-4280D0DCDDAD}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Shapes", "Shapes\Shapes.vcxproj", "{B66362B4-B4BE-42AB-B608-AA065E95BA4C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -31,6 +33,14 @@ Global
 		{DAC5523E-D8C5-47DE-858F-4280D0DCDDAD}.Release|x64.Build.0 = Release|x64
 		{DAC5523E-D8C5-47DE-858F-4280D0DCDDAD}.Release|x86.ActiveCfg = Release|Win32
 		{DAC5523E-D8C5-47DE-858F-4280D0DCDDAD}.Release|x86.Build.0 = Release|Win32
+		{B66362B4-B4BE-42AB-B608-AA065E95BA4C}.Debug|x64.ActiveCfg = Debug|x64
+		{B66362B4-B4BE-42AB-B608-AA065E95BA4C}.Debug|x64.Build.0 = Debug|x64
+		{B66362B4-B4BE-42AB-B608-AA065E95BA4C}.Debug|x86.ActiveCfg = Debug|Win32
+		{B66362B4-B4BE-42AB-B608-AA065E95BA4C}.Debug|x86.Build.0 = Debug|Win32
+		{B66362B4-B4BE-42AB-B608-AA065E95BA4C}.Release|x64.ActiveCfg = Release|x64
+		{B66362B4-B4BE-42AB-B608-AA065E95BA4C}.Release|x64.Build.0 = Release|x64
+		{B66362B4-B4BE-42AB-B608-AA065E95BA4C}.Release|x86.ActiveCfg = Release|Win32
+		{B66362B4-B4BE-42AB-B608-AA065E95BA4C}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
