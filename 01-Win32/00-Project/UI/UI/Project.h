@@ -1,6 +1,12 @@
 #define BMPEARTH		105
 #define MYICON			106
 
+#define ID_MAIN_RB_PHY		200
+#define ID_MAIN_RB_CHEM		201
+#define ID_MAIN_RB_MATHS	202
+#define ID_MAIN_RB_BIO		203
+#define ID_MAIN_OK			204
+
 #define ID_CLOSE			100
 #define ID_RBCPFORCE 		101
 #define ID_RBCPACC			102

@@ -6,6 +6,7 @@
 // global function declaration
 LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
 BOOL	CALLBACK DlgProc(HWND, UINT, WPARAM, LPARAM);
+BOOL	CALLBACK MainDlgProc(HWND, UINT, WPARAM, LPARAM);
 
 void Disable(HWND, int);
 void Reset(HWND);
@@ -89,21 +90,25 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
 	case WM_KEYDOWN:
 		switch (wParam)
 		{
-		case 'P':
-			DialogBox(hInstance, TEXT("DLGPHY"), hwnd, DlgProc);
+		case VK_SPACE:
+			DialogBox(hInstance, TEXT("DLGMAIN"), hwnd, MainDlgProc);
 			break;
-		
-		case 'C':
-			DialogBox(hInstance, TEXT("DLGCHEM"), hwnd, DlgProc);
-			break;
-		
-		case 'M':
-			DialogBox(hInstance, TEXT("DLGMATHS"), hwnd, DlgProc);
-			break;
-		
-		case 'B':
-			DialogBox(hInstance, TEXT("DLGBIO"), hwnd, DlgProc);
-			break;
+
+			/*case 'P':
+				DialogBox(hInstance, TEXT("DLGPHY"), hwnd, DlgProc);
+				break;
+
+			case 'C':
+				DialogBox(hInstance, TEXT("DLGCHEM"), hwnd, DlgProc);
+				break;
+
+			case 'M':
+				DialogBox(hInstance, TEXT("DLGMATHS"), hwnd, DlgProc);
+				break;
+
+			case 'B':
+				DialogBox(hInstance, TEXT("DLGBIO"), hwnd, DlgProc);
+				break;*/
 
 		case 'Q':
 		case VK_ESCAPE:
@@ -129,20 +134,24 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
 		hFont = CreateFont(30, 0, 0, 0, FW_SEMIBOLD, 0, 0, 0, DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, PROOF_QUALITY, FF_DONTCARE, TEXT("Consolas"));
 		SelectObject(hdc, hFont);
 		SetBkMode(hdc, TRANSPARENT);
-		
+
 		SetTextColor(hdc, RGB(255, 255, 255));
-		DrawText(hdc, TEXT("\n\n\n\n\n        Press    for Physics      "), -1, &rc, DT_VCENTER | DT_LEFT);
-		DrawText(hdc, TEXT("\n\n\n\n\n\n\n            Press    for Chemistry"), -1, &rc, DT_VCENTER | DT_LEFT);
-		DrawText(hdc, TEXT("\n\n\n\n\n\n\n\n\n        Press    for Mathematics  "), -1, &rc, DT_VCENTER | DT_LEFT);
-		DrawText(hdc, TEXT("\n\n\n\n\n\n\n\n\n\n\n            Press    for Biology  "), -1, &rc, DT_VCENTER | DT_LEFT);
-		DrawText(hdc, TEXT("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n        Press    to Quit      "), -1, &rc, DT_VCENTER | DT_LEFT);
+		//DrawText(hdc, TEXT("\n\n\n\n\n        Press    for Physics      "), -1, &rc, DT_VCENTER | DT_LEFT);
+		//DrawText(hdc, TEXT("\n\n\n\n\n\n\n            Press    for Chemistry"), -1, &rc, DT_VCENTER | DT_LEFT);
+		//DrawText(hdc, TEXT("\n\n\n\n\n\n\n\n\n        Press    for Mathematics  "), -1, &rc, DT_VCENTER | DT_LEFT);
+		//DrawText(hdc, TEXT("\n\n\n\n\n\n\n\n\n\n\n            Press    for Biology  "), -1, &rc, DT_VCENTER | DT_LEFT);
+		//DrawText(hdc, TEXT("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n        Press    to Quit      "), -1, &rc, DT_VCENTER | DT_LEFT);
+
+		DrawText(hdc, TEXT("Press       to Continue"), -1, &rc, DT_BOTTOM | DT_CENTER | DT_SINGLELINE);
 
 		SetTextColor(hdc, RGB(255, 0, 0));
-		DrawText(hdc, TEXT("\n\n\n\n\n              P                   "), -1, &rc, DT_VCENTER | DT_LEFT);
-		DrawText(hdc, TEXT("\n\n\n\n\n\n\n                  C               "), -1, &rc, DT_VCENTER | DT_LEFT);
-		DrawText(hdc, TEXT("\n\n\n\n\n\n\n\n\n              M                   "), -1, &rc, DT_VCENTER | DT_LEFT);
-		DrawText(hdc, TEXT("\n\n\n\n\n\n\n\n\n\n\n                  B               "), -1, &rc, DT_VCENTER | DT_LEFT);
-		DrawText(hdc, TEXT("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n              Q               "), -1, &rc, DT_VCENTER | DT_LEFT);
+		//DrawText(hdc, TEXT("\n\n\n\n\n              P                   "), -1, &rc, DT_VCENTER | DT_LEFT);
+		//DrawText(hdc, TEXT("\n\n\n\n\n\n\n                  C               "), -1, &rc, DT_VCENTER | DT_LEFT);
+		//DrawText(hdc, TEXT("\n\n\n\n\n\n\n\n\n              M                   "), -1, &rc, DT_VCENTER | DT_LEFT);
+		//DrawText(hdc, TEXT("\n\n\n\n\n\n\n\n\n\n\n                  B               "), -1, &rc, DT_VCENTER | DT_LEFT);
+		//DrawText(hdc, TEXT("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n              Q               "), -1, &rc, DT_VCENTER | DT_LEFT);
+
+		DrawText(hdc, TEXT("      Space            "), -1, &rc, DT_BOTTOM | DT_CENTER | DT_SINGLELINE);
 
 		EndPaint(hwnd, &ps);
 		break;
@@ -154,6 +163,67 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
 		break;
 	}
 	return(DefWindowProc(hwnd, iMsg, wParam, lParam));
+}
+
+BOOL CALLBACK MainDlgProc(HWND hDlg, UINT iMsg, WPARAM wParam, LPARAM lParam)
+{
+	static HINSTANCE hInstance;
+	static int iSubject;
+
+	switch (iMsg)
+	{
+	case WM_INITDIALOG:
+
+		// get hInstance
+		hInstance = (HINSTANCE)GetWindowLong(hDlg, GWL_HINSTANCE);
+
+		// set default radio button to Physics
+		iSubject = ID_MAIN_RB_PHY;
+		CheckRadioButton(hDlg, ID_MAIN_RB_PHY, ID_MAIN_RB_BIO, iSubject);
+		return TRUE;
+
+	case WM_COMMAND:
+		switch (LOWORD(wParam))
+		{
+		case ID_MAIN_RB_PHY:
+		case ID_MAIN_RB_CHEM:
+		case ID_MAIN_RB_MATHS:
+		case ID_MAIN_RB_BIO:
+			iSubject = LOWORD(wParam);
+			return TRUE;
+
+		case ID_MAIN_OK:
+
+			switch (iSubject)
+			{
+			case ID_MAIN_RB_PHY:
+				DialogBox(hInstance, TEXT("DLGPHY"), hDlg, DlgProc);
+				break;
+
+			case ID_MAIN_RB_CHEM:
+				DialogBox(hInstance, TEXT("DLGCHEM"), hDlg, DlgProc);
+				break;
+
+			case ID_MAIN_RB_MATHS:
+				DialogBox(hInstance, TEXT("DLGMATHS"), hDlg, DlgProc);
+				break;
+
+			case ID_MAIN_RB_BIO:
+				DialogBox(hInstance, TEXT("DLGBIO"), hDlg, DlgProc);
+				break;
+			}
+
+			return TRUE;
+
+		case IDCANCEL:
+			EndDialog(hDlg, 0);
+			return TRUE;
+		}
+		return TRUE;
+
+	}
+
+	return FALSE;
 }
 
 BOOL CALLBACK DlgProc(HWND hDlg, UINT iMsg, WPARAM wParam, LPARAM lParam)
@@ -385,7 +455,7 @@ void Disable(HWND hDlg, int iChecked)
 		hControl = GetDlgItem(hDlg, ID_CP_ETMASS);
 		EnableWindow(hControl, TRUE);
 
-		
+
 
 		hControl = GetDlgItem(hDlg, ID_CP_ETVELOCITY);
 		EnableWindow(hControl, TRUE);
@@ -437,17 +507,17 @@ void Disable(HWND hDlg, int iChecked)
 
 		// Disable Centripetal controls
 		hControl = GetDlgItem(hDlg, ID_CP_ETMASS);
-		EnableWindow(hControl, FALSE);	
-									
+		EnableWindow(hControl, FALSE);
+
 		hControl = GetDlgItem(hDlg, ID_CP_ETVELOCITY);
-		EnableWindow(hControl, FALSE);	
-										
+		EnableWindow(hControl, FALSE);
+
 		hControl = GetDlgItem(hDlg, ID_CP_ETRADIUS);
-		EnableWindow(hControl, FALSE);	
-										
+		EnableWindow(hControl, FALSE);
+
 		hControl = GetDlgItem(hDlg, ID_CP_COMPUTE);
-		EnableWindow(hControl, FALSE);	
-										
+		EnableWindow(hControl, FALSE);
+
 		hControl = GetDlgItem(hDlg, ID_CP_RESET);
 		EnableWindow(hControl, FALSE);
 	}
