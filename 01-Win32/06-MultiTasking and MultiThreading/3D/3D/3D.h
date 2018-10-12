@@ -1,5 +1,6 @@
 // RESOURCES
-#define MYICON 100
+#define MYICON		100
+#define MAINTHEME	101
 
 // Constants
 #define PI 3.14159265358979323846

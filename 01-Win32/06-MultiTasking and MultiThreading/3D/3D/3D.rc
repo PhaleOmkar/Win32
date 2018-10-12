@@ -1,2 +1,3 @@
 #include "3D.h"
-MYICON ICON 3D.ico
+MYICON		ICON	3D.ico
+MAINTHEME	WAVE	LightOfSeven.wav

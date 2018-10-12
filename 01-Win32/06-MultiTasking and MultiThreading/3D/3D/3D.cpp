@@ -4,6 +4,9 @@
 #include <math.h>
 #include "3D.h"
 
+// For PlaySound API
+#pragma comment (lib, "Winmm.lib")
+
 // Prototypes
 LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
 void Rotate(LPSTATE, UINT);
@@ -98,6 +101,10 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
 	switch (iMsg)
 	{
 	case WM_CREATE:
+
+		// start main theme music
+		PlaySound(MAKEINTRESOURCE(MAINTHEME), GetModuleHandle(NULL), SND_RESOURCE | SND_ASYNC);
+
 		// Load DLLs
 		hLib = LoadLibrary(TEXT("Shapes.dll"));
 		if (!hLib)
