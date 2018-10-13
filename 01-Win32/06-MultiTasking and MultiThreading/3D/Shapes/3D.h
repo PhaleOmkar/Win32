@@ -1,5 +1,6 @@
 // RESOURCES
-#define MYICON 100
+#define MYICON		100
+#define MAINTHEME	101
 
 // Constants
 #define PI 3.14159265358979323846
@@ -43,4 +44,6 @@ typedef struct tagSTATE {
 	MODEL Model;
 	CAMERA Camera;
 	POINTEX Points[1000];
+	int arrOffsets[250];
+	int iNoOfLetters;
 } STATE, *LPSTATE;

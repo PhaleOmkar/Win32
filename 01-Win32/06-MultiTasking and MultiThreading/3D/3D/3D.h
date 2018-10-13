@@ -44,4 +44,6 @@ typedef struct tagSTATE {
 	MODEL Model;
 	CAMERA Camera;
 	POINTEX Points[1000];
+	int arrOffsets[250];
+	int iNoOfLetters;
 } STATE, *LPSTATE;

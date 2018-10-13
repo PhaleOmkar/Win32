@@ -14,8 +14,8 @@ DWORD ThreadMove(LPVOID);
 void ResetCamera(LPSTATE);
 
 // External Functions
-typedef void (*lpfnDrawShape) (LPSTATE);
-typedef void (*lpfnSetLetters) (LPSTATE, char *);
+typedef void(*lpfnDrawShape) (LPSTATE);
+typedef void(*lpfnSetLetters) (LPSTATE, char *);
 //typedef void (ConvertToLines(int , int *, LPSTATE);
 
 // WinMain
@@ -83,10 +83,12 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
 	static HMODULE hLib2 = NULL;
 	static lpfnDrawShape DrawShape = NULL;
 	static lpfnSetLetters SetLetters = NULL;
-	
+
 	// WndProc variables 
 	static STATE State = { 0 };
+	static BOOL fSetOrigin = TRUE;
 	int iResult;
+
 
 	RECT rc;
 	PAINTSTRUCT ps;
@@ -127,7 +129,9 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
 		State.fAxis = FALSE;
 		State.Model.iNoOfPoints = 0;
 		State.Model.iNoOfLines = 0;
-		
+		State.iNoOfLetters = 0;
+
+		memset(State.arrOffsets, 0, sizeof(int) * 250);
 
 		//Cube(&State);
 		//ThreeCubes(&State);
@@ -158,9 +162,13 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
 		hPen = CreatePen(PS_DASH, 1, RGB(0, 255, 0));
 		SelectObject(hdc, hPen);
 
-		// Find Origin
-		State.Origin[0] = (rc.right / 2) + State.Offset[0];
-		State.Origin[1] = (rc.bottom / 2) + State.Offset[1];
+		// Find Origin if flag is set
+		if (fSetOrigin)
+		{
+			State.Origin[0] = (rc.right / 2) + State.Offset[0];
+			State.Origin[1] = (rc.bottom / 2) + State.Offset[1];
+			fSetOrigin = FALSE;
+		}
 
 		if (State.fAxis) {
 			// x-axis
@@ -192,9 +200,9 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
 		// Draw Object
 		for (int i = 0; i < State.Model.iNoOfLines; i++)
 		{
-			arrPoints[0].x =  (State.Camera.iScale * State.Model.arrLine[i].ptStart->x) + State.Origin[0];
+			arrPoints[0].x = (State.Camera.iScale * State.Model.arrLine[i].ptStart->x) + State.Origin[0];
 			arrPoints[0].y = -(State.Camera.iScale * State.Model.arrLine[i].ptStart->y) + State.Origin[1];
-			arrPoints[1].x =  (State.Camera.iScale * State.Model.arrLine[i].ptEnd->x) + State.Origin[0];
+			arrPoints[1].x = (State.Camera.iScale * State.Model.arrLine[i].ptEnd->x) + State.Origin[0];
 			arrPoints[1].y = -(State.Camera.iScale * State.Model.arrLine[i].ptEnd->y) + State.Origin[1];
 			Polyline(hdc, arrPoints, 2);
 		}
@@ -202,10 +210,11 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
 		// Draw Debug Info
 		SetBkColor(hdc, RGB(0, 0, 0));
 		SetTextColor(hdc, RGB(255, 255, 255));
-		sprintf_s(lpszDebugInfo, "Angles:\n\tX: %d\n\tY: %d\n\tZ: %d\n\nDirections:\n\tX: %d\n\tY: %d\n\tZ: %d\n\nScale: %d", 
+		sprintf_s(lpszDebugInfo, "Angles:\n\tX: %d\n\tY: %d\n\tZ: %d\n\nDirections:\n\tX: %d\n\tY: %d\n\tZ: %d\n\nScale: %d\n\nOrigin:\n\tX: %d\n\tY: %d",
 			State.Camera.xAngle, State.Camera.yAngle, State.Camera.zAngle,
 			State.Directions[0], State.Directions[1], State.Directions[2],
-			State.Camera.iScale);
+			State.Camera.iScale,
+			State.Origin[0], State.Origin[1]);
 		DrawText(hdc, lpszDebugInfo, -1, &rc, DT_TOP | DT_LEFT);
 
 		EndPaint(hwnd, &ps);
@@ -215,6 +224,22 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
 
 		switch (wParam)
 		{
+		case 'U':
+			State.Origin[1] -= 5;
+			break;
+
+		case 'H':
+			State.Origin[0] -= 5;
+			break;
+
+		case 'J':
+			State.Origin[0] += 5;
+			break;
+
+		case 'N':
+			State.Origin[1] += 5;
+			break;
+
 		case '1':
 			DrawShape = (lpfnDrawShape)GetProcAddress(hLib, "Cube");
 			if (!DrawShape)
@@ -251,7 +276,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
 			}
 			DrawShape(&State);
 			break;
-				
+
 		case '5':DrawShape = (lpfnDrawShape)GetProcAddress(hLib, "FiveAngleStar");
 			if (!DrawShape)
 			{
@@ -387,7 +412,7 @@ void Rotate(LPSTATE State, UINT iAxis)
 		// Adjust Camera Angle
 		if (State->Directions[0] == 1)
 		{
-			if (State->Camera.xAngle < 360)
+			if (State->Camera.xAngle < 359)
 				State->Camera.xAngle++;
 			else State->Camera.xAngle = 0;
 		}
@@ -396,7 +421,7 @@ void Rotate(LPSTATE State, UINT iAxis)
 		{
 			if (State->Camera.xAngle > 0)
 				State->Camera.xAngle--;
-			else State->Camera.xAngle = 360;
+			else State->Camera.xAngle = 359;
 		}
 
 		// Calculate Rotation Matrix 
@@ -422,7 +447,7 @@ void Rotate(LPSTATE State, UINT iAxis)
 		// Adjust Camera Angle
 		if (State->Directions[1] == 1)
 		{
-			if (State->Camera.yAngle < 360)
+			if (State->Camera.yAngle < 359)
 				State->Camera.yAngle++;
 			else State->Camera.yAngle = 0;
 		}
@@ -431,7 +456,7 @@ void Rotate(LPSTATE State, UINT iAxis)
 		{
 			if (State->Camera.yAngle > 0)
 				State->Camera.yAngle--;
-			else State->Camera.yAngle = 360;
+			else State->Camera.yAngle = 359;
 		}
 
 		// Calculate Rotation Matrix 
@@ -457,7 +482,7 @@ void Rotate(LPSTATE State, UINT iAxis)
 		// Adjust Camera Angle
 		if (State->Directions[2] == 1)
 		{
-			if (State->Camera.zAngle < 360)
+			if (State->Camera.zAngle < 359)
 				State->Camera.zAngle++;
 			else State->Camera.zAngle = 0;
 		}
@@ -466,7 +491,7 @@ void Rotate(LPSTATE State, UINT iAxis)
 		{
 			if (State->Camera.zAngle > 0)
 				State->Camera.zAngle--;
-			else State->Camera.zAngle = 360;
+			else State->Camera.zAngle = 359;
 		}
 
 		// Calculate Rotation Matrix 
@@ -506,16 +531,104 @@ DWORD ThreadMove(LPVOID State)
 {
 	RECT rc;
 	LPSTATE lpState = (LPSTATE)State;
+	double dTmp[3];
+	//while (TRUE)
+	//{
+	//	Rotate(lpState, XAXIS);
+	//	Rotate(lpState, YAXIS);
+	//	Rotate(lpState, ZAXIS);
+	//	GetClientRect(lpState->hwnd, &rc);
+	//	InvalidateRect(lpState->hwnd, &rc, TRUE);
+	//	Sleep(100);
+	//}
 
-	while (TRUE)
+	// Calculate Rotation Matrix 
+	double dRotationMatrix[3][3] = { 0 };
+	dRotationMatrix[0][0] = 1;
+	dRotationMatrix[0][1] = 0;
+	dRotationMatrix[0][2] = 0;
+
+	dRotationMatrix[1][0] = 0;
+	dRotationMatrix[1][1] = 0.98480775301;
+	dRotationMatrix[1][2] = -0.17364817766;
+
+	dRotationMatrix[2][0] = 0;
+	dRotationMatrix[2][1] = 0.17364817766;
+	dRotationMatrix[2][2] = 0.98480775301;
+
+	//dRotationMatrix[0][0] = 0.98480775301;
+	//dRotationMatrix[0][1] = 0;
+	//dRotationMatrix[0][2] = 0.17364817766;
+
+	//dRotationMatrix[1][0] = 0;
+	//dRotationMatrix[1][1] = 1;
+	//dRotationMatrix[1][2] = 0;
+
+	//dRotationMatrix[2][0] = -0.17364817766;
+	//dRotationMatrix[2][1] = 0;
+	//dRotationMatrix[2][2] = 0.98480775301;
+
+	int i = 0;
+	int iBegin = 249; 
+	int iEnd = 0;
+
+	for (int k = 0; k < 36 + lpState->iNoOfLetters; k++)
 	{
-		Rotate(lpState, XAXIS);
-		Rotate(lpState, YAXIS);
-		Rotate(lpState, ZAXIS);
+		for (int j = lpState->arrOffsets[iBegin]; j < lpState->arrOffsets[iEnd]; j++)
+		{
+			dTmp[0] = (dRotationMatrix[0][0] * lpState->Points[j].x) + (dRotationMatrix[0][1] * lpState->Points[j].y) + (dRotationMatrix[0][2] * lpState->Points[j].z);
+			dTmp[1] = (dRotationMatrix[1][0] * lpState->Points[j].x) + (dRotationMatrix[1][1] * lpState->Points[j].y) + (dRotationMatrix[1][2] * lpState->Points[j].z);
+			dTmp[2] = (dRotationMatrix[2][0] * lpState->Points[j].x) + (dRotationMatrix[2][1] * lpState->Points[j].y) + (dRotationMatrix[2][2] * lpState->Points[j].z);
+
+			lpState->Points[j].x = dTmp[0];
+			lpState->Points[j].y = dTmp[1];
+			lpState->Points[j].z = dTmp[2];
+		}
+
 		GetClientRect(lpState->hwnd, &rc);
 		InvalidateRect(lpState->hwnd, &rc, TRUE);
 		Sleep(100);
+
+		if (k < lpState->iNoOfLetters - 1)
+		{
+			iEnd++;
+		}
+
+		if (k = 35)
+		{
+			iBegin = 0;
+		}
+
+		if (k > 35)
+		{
+			iBegin++;
+		}
+
 	}
+	
+	/*while (i < lpState->iNoOfLetters)
+	{
+		
+
+
+		for (int j = 0; j < lpState->arrOffsets[i]; j++)
+		{
+			dTmp[0] = (dRotationMatrix[0][0] * lpState->Points[j].x) + (dRotationMatrix[0][1] * lpState->Points[j].y) + (dRotationMatrix[0][2] * lpState->Points[j].z);
+			dTmp[1] = (dRotationMatrix[1][0] * lpState->Points[j].x) + (dRotationMatrix[1][1] * lpState->Points[j].y) + (dRotationMatrix[1][2] * lpState->Points[j].z);
+			dTmp[2] = (dRotationMatrix[2][0] * lpState->Points[j].x) + (dRotationMatrix[2][1] * lpState->Points[j].y) + (dRotationMatrix[2][2] * lpState->Points[j].z);
+
+			lpState->Points[j].x = dTmp[0];
+			lpState->Points[j].y = dTmp[1];
+			lpState->Points[j].z = dTmp[2];
+		}
+
+		GetClientRect(lpState->hwnd, &rc);
+		InvalidateRect(lpState->hwnd, &rc, TRUE);
+		Sleep(100);
+		
+		if(i != lpState->iNoOfLetters - 1)
+			i++;
+	}*/
 
 	return 0;
 }

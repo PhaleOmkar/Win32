@@ -69,6 +69,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszCmdLi
 
 LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
 {
+	static BOOL fIsSplashScreen = TRUE;
 	static int cxClient, cyClient;
 	static HBITMAP hbmpImage = NULL;
 
@@ -91,7 +92,16 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
 		switch (wParam)
 		{
 		case VK_SPACE:
+			fIsSplashScreen = FALSE;
+			
+			GetClientRect(hwnd, &rc);
+			InvalidateRect(hwnd, &rc, TRUE);
+
 			DialogBox(hInstance, TEXT("DLGMAIN"), hwnd, MainDlgProc);
+			
+			fIsSplashScreen = TRUE;
+			InvalidateRect(hwnd, &rc, TRUE);
+			
 			break;
 
 			/*case 'P':
@@ -135,24 +145,26 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
 		SelectObject(hdc, hFont);
 		SetBkMode(hdc, TRANSPARENT);
 
-		SetTextColor(hdc, RGB(255, 255, 255));
-		//DrawText(hdc, TEXT("\n\n\n\n\n        Press    for Physics      "), -1, &rc, DT_VCENTER | DT_LEFT);
-		//DrawText(hdc, TEXT("\n\n\n\n\n\n\n            Press    for Chemistry"), -1, &rc, DT_VCENTER | DT_LEFT);
-		//DrawText(hdc, TEXT("\n\n\n\n\n\n\n\n\n        Press    for Mathematics  "), -1, &rc, DT_VCENTER | DT_LEFT);
-		//DrawText(hdc, TEXT("\n\n\n\n\n\n\n\n\n\n\n            Press    for Biology  "), -1, &rc, DT_VCENTER | DT_LEFT);
-		//DrawText(hdc, TEXT("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n        Press    to Quit      "), -1, &rc, DT_VCENTER | DT_LEFT);
+		if (fIsSplashScreen)
+		{
+			SetTextColor(hdc, RGB(255, 255, 255));
+			//DrawText(hdc, TEXT("\n\n\n\n\n        Press    for Physics      "), -1, &rc, DT_VCENTER | DT_LEFT);
+			//DrawText(hdc, TEXT("\n\n\n\n\n\n\n            Press    for Chemistry"), -1, &rc, DT_VCENTER | DT_LEFT);
+			//DrawText(hdc, TEXT("\n\n\n\n\n\n\n\n\n        Press    for Mathematics  "), -1, &rc, DT_VCENTER | DT_LEFT);
+			//DrawText(hdc, TEXT("\n\n\n\n\n\n\n\n\n\n\n            Press    for Biology  "), -1, &rc, DT_VCENTER | DT_LEFT);
+			//DrawText(hdc, TEXT("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n        Press    to Quit      "), -1, &rc, DT_VCENTER | DT_LEFT);
 
-		DrawText(hdc, TEXT("Press       to Continue"), -1, &rc, DT_BOTTOM | DT_CENTER | DT_SINGLELINE);
+			DrawText(hdc, TEXT("Press       to Continue"), -1, &rc, DT_BOTTOM | DT_CENTER | DT_SINGLELINE);
 
-		SetTextColor(hdc, RGB(255, 0, 0));
-		//DrawText(hdc, TEXT("\n\n\n\n\n              P                   "), -1, &rc, DT_VCENTER | DT_LEFT);
-		//DrawText(hdc, TEXT("\n\n\n\n\n\n\n                  C               "), -1, &rc, DT_VCENTER | DT_LEFT);
-		//DrawText(hdc, TEXT("\n\n\n\n\n\n\n\n\n              M                   "), -1, &rc, DT_VCENTER | DT_LEFT);
-		//DrawText(hdc, TEXT("\n\n\n\n\n\n\n\n\n\n\n                  B               "), -1, &rc, DT_VCENTER | DT_LEFT);
-		//DrawText(hdc, TEXT("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n              Q               "), -1, &rc, DT_VCENTER | DT_LEFT);
+			SetTextColor(hdc, RGB(255, 0, 0));
+			//DrawText(hdc, TEXT("\n\n\n\n\n              P                   "), -1, &rc, DT_VCENTER | DT_LEFT);
+			//DrawText(hdc, TEXT("\n\n\n\n\n\n\n                  C               "), -1, &rc, DT_VCENTER | DT_LEFT);
+			//DrawText(hdc, TEXT("\n\n\n\n\n\n\n\n\n              M                   "), -1, &rc, DT_VCENTER | DT_LEFT);
+			//DrawText(hdc, TEXT("\n\n\n\n\n\n\n\n\n\n\n                  B               "), -1, &rc, DT_VCENTER | DT_LEFT);
+			//DrawText(hdc, TEXT("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n              Q               "), -1, &rc, DT_VCENTER | DT_LEFT);
 
-		DrawText(hdc, TEXT("      Space            "), -1, &rc, DT_BOTTOM | DT_CENTER | DT_SINGLELINE);
-
+			DrawText(hdc, TEXT("      Space            "), -1, &rc, DT_BOTTOM | DT_CENTER | DT_SINGLELINE);
+		}
 		EndPaint(hwnd, &ps);
 		break;
 

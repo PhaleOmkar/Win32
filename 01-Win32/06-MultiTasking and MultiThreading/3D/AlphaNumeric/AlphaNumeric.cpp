@@ -65,6 +65,7 @@ void ConvertToLines(LPSTATE State, int iNoOfPoints, int *matGraph)
 void Convert2DTo3D(LPSTATE State, int iNoOfPoints, int *arr2DPoints)
 {
 	int iPointNo = State->Model.iNoOfPoints;
+	State->arrOffsets[State->iNoOfLetters++] = iPointNo + (iNoOfPoints * 2);
 
 	// set Z for each point
 	for (int i = 0; i < iNoOfPoints * 2; i += 2)
