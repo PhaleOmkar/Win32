@@ -1,4 +1,4 @@
-LIBRARY AutomationProxyStub.dll
+LIBRARY AutomationProxyStub
 EXPORTS
 	DllGetClassObject		PRIVATE
 	DllCanUnloadNow			PRIVATE

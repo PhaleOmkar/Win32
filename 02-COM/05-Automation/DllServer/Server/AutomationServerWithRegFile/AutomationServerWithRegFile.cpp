@@ -307,7 +307,7 @@ HRESULT CMyMath::Invoke(DISPID dispIdMember, REFIID riid, LCID lcid, WORD wFlags
 }
 
 // Implementation of exported functions from this Dll
-extern "C" HRESULT __stdcall GetDllClassObject(REFCLSID rclsid, REFIID riid, void **ppv)
+extern "C" HRESULT __stdcall DllGetClassObject(REFCLSID rclsid, REFIID riid, void **ppv)
 {
 	// variable declaration
 	CMyMathClassFactory *pMyMathsClassFactory = NULL;

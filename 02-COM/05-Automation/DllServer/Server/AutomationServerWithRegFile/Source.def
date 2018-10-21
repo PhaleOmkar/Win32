@@ -1,4 +1,0 @@
-LIBRARY AutomationServer
-EXPORS
-	DllGetObject		PRIVATE;
-	DllCanUnloadNow		PRIVATE;
