@@ -1,3 +1,5 @@
+#pragma region Main Resources
+
 #define BMPEARTH		105
 #define MYICON			106
 
@@ -6,6 +8,10 @@
 #define ID_MAIN_RB_MATHS	202
 #define ID_MAIN_RB_BIO		203
 #define ID_MAIN_OK			204
+
+#pragma endregion
+
+#pragma region Physics
 
 #define ID_CLOSE			100
 #define ID_RBCPFORCE 		101
@@ -25,3 +31,18 @@
 #define ID_CPA_ETRESULT		116
 #define ID_CPA_COMPUTE		117
 #define ID_CPA_RESET		118
+
+#pragma endregion
+
+#pragma region Chemistry
+
+#define ID_CHEM_GP			300
+#define ID_CHEM_ETMMASS		301
+#define ID_CHEM_ETAMOUNT	302
+#define ID_CHEM_LRESULT		303
+#define ID_CHEM_CALCULATE	304
+#define ID_CHEM_RESET		305
+
+#pragma endregion
+
+

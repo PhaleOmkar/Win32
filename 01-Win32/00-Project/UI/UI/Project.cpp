@@ -1,21 +1,38 @@
-// Headers
+#pragma region Headers
+
 #include <Windows.h>
 #include <stdio.h>
 #include "Project.h"
 
-// global function declaration
+#pragma endregion
+
+#pragma region Global Function Declarations
+
 LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
-BOOL	CALLBACK DlgProc(HWND, UINT, WPARAM, LPARAM);
 BOOL	CALLBACK MainDlgProc(HWND, UINT, WPARAM, LPARAM);
+BOOL	CALLBACK PhyDlgProc(HWND, UINT, WPARAM, LPARAM);
+BOOL	CALLBACK ChemDlgProc(HWND, UINT, WPARAM, LPARAM);
 
-void Disable(HWND, int);
-void Reset(HWND);
+// For Physics
+void PhyDisable(HWND, int);
+void PhyReset(HWND);
 
-// External functions
+// For Chemistry
+void ChemReset(HWND);
+
+#pragma endregion
+
+#pragma region External Functions
+// For Physics
 typedef double(*lpfnCalculateCentripetalForce) (double, double, double);
 typedef double(*lpfnCalculateCentripetalAcceleration) (double, double);
 
-// WinMain()
+// For Chemistry
+typedef double(*lpfnCalculateNumberOfMolecules) (double, double);
+#pragma endregion
+
+#pragma region Main Window
+// WinMain
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszCmdLine, int iCmdShow)
 {
 	// variable declaration
@@ -67,11 +84,13 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszCmdLi
 	return ((int)msg.wParam);
 }
 
+// Window Procedure
 LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
 {
 	static BOOL fIsSplashScreen = TRUE;
 	static int cxClient, cyClient;
 	static HBITMAP hbmpImage = NULL;
+	int iX = 0, iY = 0;
 
 	HINSTANCE hInstance = NULL;
 	HDC hdc, hdcCompatible;
@@ -105,19 +124,19 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
 			break;
 
 			/*case 'P':
-				DialogBox(hInstance, TEXT("DLGPHY"), hwnd, DlgProc);
+				DialogBox(hInstance, TEXT("DLGPHY"), hwnd, PhyDlgProc);
 				break;
 
 			case 'C':
-				DialogBox(hInstance, TEXT("DLGCHEM"), hwnd, DlgProc);
+				DialogBox(hInstance, TEXT("DLGCHEM"), hwnd, PhyDlgProc);
 				break;
 
 			case 'M':
-				DialogBox(hInstance, TEXT("DLGMATHS"), hwnd, DlgProc);
+				DialogBox(hInstance, TEXT("DLGMATHS"), hwnd, PhyDlgProc);
 				break;
 
 			case 'B':
-				DialogBox(hInstance, TEXT("DLGBIO"), hwnd, DlgProc);
+				DialogBox(hInstance, TEXT("DLGBIO"), hwnd, PhyDlgProc);
 				break;*/
 
 		case 'Q':
@@ -135,9 +154,15 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
 	case WM_PAINT:
 		hdc = BeginPaint(hwnd, &ps);
 		hdcCompatible = CreateCompatibleDC(hdc);
+		
 		GetObject(hbmpImage, sizeof(BITMAP), &bmpImage);
 		SelectObject(hdcCompatible, hbmpImage);
-		BitBlt(hdc, 0, 0, cxClient, cyClient, hdcCompatible, 0, 0, SRCCOPY);
+		
+		// calculate points so that image will be in the center of the display
+		iX = (cxClient / 2) - (bmpImage.bmWidth / 2);
+		iY = (cyClient / 2) - (bmpImage.bmHeight / 2);
+		
+		BitBlt(hdc, iX, iY, bmpImage.bmWidth, bmpImage.bmHeight, hdcCompatible, 0, 0, SRCCOPY);
 		DeleteDC(hdcCompatible);
 
 		GetClientRect(hwnd, &rc);
@@ -177,6 +202,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
 	return(DefWindowProc(hwnd, iMsg, wParam, lParam));
 }
 
+// Main Dialog Procedure
 BOOL CALLBACK MainDlgProc(HWND hDlg, UINT iMsg, WPARAM wParam, LPARAM lParam)
 {
 	static HINSTANCE hInstance;
@@ -209,19 +235,19 @@ BOOL CALLBACK MainDlgProc(HWND hDlg, UINT iMsg, WPARAM wParam, LPARAM lParam)
 			switch (iSubject)
 			{
 			case ID_MAIN_RB_PHY:
-				DialogBox(hInstance, TEXT("DLGPHY"), hDlg, DlgProc);
+				DialogBox(hInstance, TEXT("DLGPHY"), hDlg, PhyDlgProc);
 				break;
 
 			case ID_MAIN_RB_CHEM:
-				DialogBox(hInstance, TEXT("DLGCHEM"), hDlg, DlgProc);
+				DialogBox(hInstance, TEXT("DLGCHEM"), hDlg, ChemDlgProc);
 				break;
 
 			case ID_MAIN_RB_MATHS:
-				DialogBox(hInstance, TEXT("DLGMATHS"), hDlg, DlgProc);
+				DialogBox(hInstance, TEXT("DLGMATHS"), hDlg, PhyDlgProc);
 				break;
 
 			case ID_MAIN_RB_BIO:
-				DialogBox(hInstance, TEXT("DLGBIO"), hDlg, DlgProc);
+				DialogBox(hInstance, TEXT("DLGBIO"), hDlg, PhyDlgProc);
 				break;
 			}
 
@@ -237,8 +263,11 @@ BOOL CALLBACK MainDlgProc(HWND hDlg, UINT iMsg, WPARAM wParam, LPARAM lParam)
 
 	return FALSE;
 }
+#pragma endregion
 
-BOOL CALLBACK DlgProc(HWND hDlg, UINT iMsg, WPARAM wParam, LPARAM lParam)
+#pragma region Physics
+// Physics Dialog Procedure
+BOOL CALLBACK PhyDlgProc(HWND hDlg, UINT iMsg, WPARAM wParam, LPARAM lParam)
 {
 	static HMODULE hDll = NULL;
 	static HANDLE hFile = NULL;
@@ -270,7 +299,7 @@ BOOL CALLBACK DlgProc(HWND hDlg, UINT iMsg, WPARAM wParam, LPARAM lParam)
 		// initialize radio button
 		iForce = ID_RBCPFORCE;
 		CheckRadioButton(hDlg, ID_RBCPFORCE, ID_RBCPACC, iForce);
-		Disable(hDlg, iForce);
+		PhyDisable(hDlg, iForce);
 
 		// initialize close button
 		hControl = GetDlgItem(hDlg, ID_CLOSE);
@@ -283,7 +312,7 @@ BOOL CALLBACK DlgProc(HWND hDlg, UINT iMsg, WPARAM wParam, LPARAM lParam)
 		hDll = LoadLibrary(TEXT("Physics.dll"));
 		if (hDll == NULL)
 		{
-			MessageBox(hDlg, TEXT("Unable to Physics DLL"), TEXT("Error"), MB_OK);
+			MessageBox(hDlg, TEXT("Unable to load Physics DLL"), TEXT("Error"), MB_OK);
 			EndDialog(hDlg, -1);
 		}
 
@@ -310,7 +339,7 @@ BOOL CALLBACK DlgProc(HWND hDlg, UINT iMsg, WPARAM wParam, LPARAM lParam)
 		case ID_RBCPFORCE:
 		case ID_RBCPACC:
 			iForce = LOWORD(wParam);
-			Disable(hDlg, iForce);
+			PhyDisable(hDlg, iForce);
 			return TRUE;
 
 		case ID_CP_COMPUTE:
@@ -429,7 +458,7 @@ BOOL CALLBACK DlgProc(HWND hDlg, UINT iMsg, WPARAM wParam, LPARAM lParam)
 
 		case ID_CP_RESET:
 		case ID_CPA_RESET:
-			Reset(hDlg);
+			PhyReset(hDlg);
 			break;
 
 		case IDCANCEL:
@@ -442,7 +471,8 @@ BOOL CALLBACK DlgProc(HWND hDlg, UINT iMsg, WPARAM wParam, LPARAM lParam)
 	return FALSE;
 }
 
-void Reset(HWND hDlg)
+// Physics Related functions
+void PhyReset(HWND hDlg)
 {
 	// Reset Centripetal
 	SetDlgItemText(hDlg, ID_CP_ETMASS, TEXT(""));
@@ -456,18 +486,16 @@ void Reset(HWND hDlg)
 	SetDlgItemText(hDlg, ID_CPA_ETRESULT, TEXT(""));
 }
 
-void Disable(HWND hDlg, int iChecked)
+void PhyDisable(HWND hDlg, int iChecked)
 {
 	HWND hControl = NULL;
-	Reset(hDlg);
+	PhyReset(hDlg);
 
 	if (iChecked == ID_RBCPFORCE)
 	{
 		// Enabe Centripetal controls 
 		hControl = GetDlgItem(hDlg, ID_CP_ETMASS);
 		EnableWindow(hControl, TRUE);
-
-
 
 		hControl = GetDlgItem(hDlg, ID_CP_ETVELOCITY);
 		EnableWindow(hControl, TRUE);
@@ -536,3 +564,132 @@ void Disable(HWND hDlg, int iChecked)
 
 	return;
 }
+#pragma endregion
+
+#pragma region Chemistry
+// Chemistry Dialog Procedure
+BOOL CALLBACK ChemDlgProc(HWND hDlg, UINT iMsg, WPARAM wParam, LPARAM lParam)
+{
+	static HMODULE hDll = NULL;
+	static HANDLE hFile = NULL;
+	static int iNoOfFile = 0;
+	static lpfnCalculateNumberOfMolecules CalculateNumberOfMolecules = NULL;
+	static double dOldMolecularMass;
+	static double dOldAmountOfSubstance;
+	double dMolecularMass;
+	double dAmountOfSubstance;
+	char szTmp[255] = "";
+	double dResult = 0.0;
+
+	switch (iMsg)
+	{
+	#pragma region WM_INITDIALOG
+	case WM_INITDIALOG:
+		// initialize variable
+		dOldMolecularMass = 0.0;
+		dOldAmountOfSubstance = 0.0;
+		dMolecularMass = 0.0;
+		dAmountOfSubstance = 0.0;
+
+		// Load Physics DLL
+		hDll = LoadLibrary(TEXT("ChemistryHelper.dll"));
+		if (hDll == NULL)
+		{
+			MessageBox(hDlg, TEXT("Unable to load Chemistry DLL"), TEXT("Error"), MB_OK);
+			EndDialog(hDlg, -1);
+		}
+
+		CalculateNumberOfMolecules = (lpfnCalculateNumberOfMolecules)GetProcAddress(hDll, "CalculateNumberOfMolecules");
+		if (CalculateNumberOfMolecules == NULL)
+		{
+			MessageBox(hDlg, TEXT("Unable to locate CalculateNumberOfMolecules function"), TEXT("Error"), MB_OK);
+			EndDialog(hDlg, -1);
+		}
+		return TRUE;
+	#pragma endregion
+	
+	#pragma region WM_COMMAND
+	case WM_COMMAND:
+		
+		switch (LOWORD(wParam))
+		{
+
+		case ID_CHEM_CALCULATE:
+			
+			// Get Molecular Mass
+			GetDlgItemText(hDlg, ID_CHEM_ETMMASS, szTmp, 100);
+			dMolecularMass = atof(szTmp);
+			if (dMolecularMass == 0)
+			{
+				MessageBox(hDlg, TEXT("Incorrect Molecular Mass!"), TEXT("Error"), MB_OK);
+				return(TRUE);
+			}
+
+			// Get Amount Of Substance
+			GetDlgItemText(hDlg, ID_CHEM_ETAMOUNT, szTmp, 100);
+			dAmountOfSubstance = atof(szTmp);
+			if (dAmountOfSubstance == 0)
+			{
+				MessageBox(hDlg, TEXT("Incorrect Amount Of Substance!"), TEXT("Error"), MB_OK);
+				return(TRUE);
+			}
+
+			// Check if already computed
+			if ((dOldAmountOfSubstance == dAmountOfSubstance) && (dOldMolecularMass == dMolecularMass))
+			{
+				MessageBox(hDlg, TEXT("Already Computed!"), TEXT("Info"), MB_OK);
+				return(TRUE);
+			}
+
+			// Compute the value
+			dResult = CalculateNumberOfMolecules(dMolecularMass, dAmountOfSubstance);
+
+			// create file to store result
+			wsprintf(szTmp, TEXT("NumberOfMolecules%d.txt"), iNoOfFile++);
+			hFile = CreateFile(szTmp, GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+
+			// display result 
+			sprintf_s(szTmp, TEXT("Molecular Mass      : %g g/mol\nAmount Of Substance : %g g\n\nNumber of Molecules : %g "), dMolecularMass, dAmountOfSubstance, dResult);
+
+			// display result in message box
+			MessageBox(hDlg, TEXT(szTmp), TEXT("Message"), MB_OK | MB_ICONINFORMATION);
+
+			// write result to file
+			WriteFile(hFile, szTmp, strlen(szTmp), NULL, NULL);
+
+			sprintf_s(szTmp, "%g", dResult);
+			SetDlgItemText(hDlg, ID_CHEM_LRESULT, szTmp);
+
+			// Set Old state
+			dOldAmountOfSubstance = dAmountOfSubstance;
+			dOldMolecularMass = dMolecularMass;
+
+			return TRUE;
+
+		case ID_CHEM_RESET:
+			ChemReset(hDlg);
+			return TRUE;
+
+		case IDCANCEL:
+			FreeLibrary(hDll);
+			EndDialog(hDlg, 0);
+			return TRUE;
+		}
+
+		break;
+	#pragma endregion
+	}
+
+	return FALSE;
+	
+}
+
+// Chemistry Related functions
+void ChemReset(HWND hDlg)
+{
+	// Reset All Fields
+	SetDlgItemText(hDlg, ID_CHEM_ETMMASS, TEXT(""));
+	SetDlgItemText(hDlg, ID_CHEM_ETAMOUNT, TEXT(""));
+	SetDlgItemText(hDlg, ID_CHEM_LRESULT, TEXT(""));
+}
+#pragma endregion
