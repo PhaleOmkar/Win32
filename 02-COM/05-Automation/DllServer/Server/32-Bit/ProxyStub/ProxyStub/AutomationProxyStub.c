@@ -7,7 +7,7 @@
 /* at Tue Jan 19 08:44:07 2038
  */
 /* Compiler settings for AutomationServerTypeLib.idl:
-    Oicf, W1, Zp8, env=Win64 (32b run), target_arch=AMD64 8.01.0622 
+    Oicf, W1, Zp8, env=Win32 (32b run), target_arch=X86 8.01.0622 
     protocol : dce , ms_ext, c_ext, robust
     error checks: allocation ref bounds_check enum stub_data 
     VC __declspec() decoration level: 
@@ -16,7 +16,7 @@
 */
 /* @@MIDL_FILE_HEADING(  ) */
 
-#if defined(_M_AMD64)
+#if !defined(_M_IA64) && !defined(_M_AMD64) && !defined(_ARM_)
 
 
 #pragma warning( disable: 4049 )  /* more than 64k source lines */
@@ -28,6 +28,9 @@
 #pragma warning( disable: 4232 )  /* dllimport identity*/
 #pragma warning( disable: 4024 )  /* array to pointer mapping*/
 #pragma warning( disable: 4152 )  /* function/data pointer conversion in expression */
+#pragma warning( disable: 4100 ) /* unreferenced arguments in x86 call */
+
+#pragma optimize("", off ) 
 
 #define USE_STUBLESS_PROXY
 
@@ -44,10 +47,10 @@
 #endif /* __RPCPROXY_H_VERSION__ */
 
 
-#include "AutomationServerProxyStubHeader.h"
+#include "AutomationProxyStubHeader.h"
 
 #define TYPE_FORMAT_STRING_SIZE   7                                 
-#define PROC_FORMAT_STRING_SIZE   101                               
+#define PROC_FORMAT_STRING_SIZE   97                                
 #define EXPR_FORMAT_STRING_SIZE   1                                 
 #define TRANSMIT_AS_TABLE_SIZE    0            
 #define WIRE_MARSHAL_TABLE_SIZE   0            
@@ -88,9 +91,17 @@ extern const MIDL_STUBLESS_PROXY_INFO IMyMath_ProxyInfo;
 
 
 
-#if !defined(__RPC_WIN64__)
+#if !defined(__RPC_WIN32__)
 #error  Invalid build platform for this stub.
 #endif
+
+#if !(TARGET_IS_NT50_OR_LATER)
+#error You need Windows 2000 or later to run this stub because it uses these features:
+#error   /robust command line switch.
+#error However, your C/C++ compilation flags indicate you intend to run this app on earlier systems.
+#error This app will fail with the RPC_X_WRONG_STUB_VERSION error.
+#endif
+
 
 static const AutomationServerTypeLib_MIDL_PROC_FORMAT_STRING AutomationServerTypeLib__MIDL_ProcFormatString =
     {
@@ -103,90 +114,88 @@ static const AutomationServerTypeLib_MIDL_PROC_FORMAT_STRING AutomationServerTyp
 			0x6c,		/* Old Flags:  object, Oi2 */
 /*  2 */	NdrFcLong( 0x0 ),	/* 0 */
 /*  6 */	NdrFcShort( 0x7 ),	/* 7 */
-/*  8 */	NdrFcShort( 0x28 ),	/* X64 Stack size/offset = 40 */
+/*  8 */	NdrFcShort( 0x14 ),	/* x86 Stack size/offset = 20 */
 /* 10 */	NdrFcShort( 0x10 ),	/* 16 */
 /* 12 */	NdrFcShort( 0x24 ),	/* 36 */
 /* 14 */	0x44,		/* Oi2 Flags:  has return, has ext, */
 			0x4,		/* 4 */
-/* 16 */	0xa,		/* 10 */
+/* 16 */	0x8,		/* 8 */
 			0x1,		/* Ext Flags:  new corr desc, */
 /* 18 */	NdrFcShort( 0x0 ),	/* 0 */
 /* 20 */	NdrFcShort( 0x0 ),	/* 0 */
 /* 22 */	NdrFcShort( 0x0 ),	/* 0 */
-/* 24 */	NdrFcShort( 0x0 ),	/* 0 */
 
 	/* Parameter __MIDL__IMyMath0000 */
 
-/* 26 */	NdrFcShort( 0x48 ),	/* Flags:  in, base type, */
-/* 28 */	NdrFcShort( 0x8 ),	/* X64 Stack size/offset = 8 */
-/* 30 */	0x8,		/* FC_LONG */
+/* 24 */	NdrFcShort( 0x48 ),	/* Flags:  in, base type, */
+/* 26 */	NdrFcShort( 0x4 ),	/* x86 Stack size/offset = 4 */
+/* 28 */	0x8,		/* FC_LONG */
 			0x0,		/* 0 */
 
 	/* Parameter __MIDL__IMyMath0001 */
 
-/* 32 */	NdrFcShort( 0x48 ),	/* Flags:  in, base type, */
-/* 34 */	NdrFcShort( 0x10 ),	/* X64 Stack size/offset = 16 */
-/* 36 */	0x8,		/* FC_LONG */
+/* 30 */	NdrFcShort( 0x48 ),	/* Flags:  in, base type, */
+/* 32 */	NdrFcShort( 0x8 ),	/* x86 Stack size/offset = 8 */
+/* 34 */	0x8,		/* FC_LONG */
 			0x0,		/* 0 */
 
 	/* Parameter __MIDL__IMyMath0002 */
 
-/* 38 */	NdrFcShort( 0x2150 ),	/* Flags:  out, base type, simple ref, srv alloc size=8 */
-/* 40 */	NdrFcShort( 0x18 ),	/* X64 Stack size/offset = 24 */
-/* 42 */	0x8,		/* FC_LONG */
+/* 36 */	NdrFcShort( 0x2150 ),	/* Flags:  out, base type, simple ref, srv alloc size=8 */
+/* 38 */	NdrFcShort( 0xc ),	/* x86 Stack size/offset = 12 */
+/* 40 */	0x8,		/* FC_LONG */
 			0x0,		/* 0 */
 
 	/* Return value */
 
-/* 44 */	NdrFcShort( 0x70 ),	/* Flags:  out, return, base type, */
-/* 46 */	NdrFcShort( 0x20 ),	/* X64 Stack size/offset = 32 */
-/* 48 */	0x8,		/* FC_LONG */
+/* 42 */	NdrFcShort( 0x70 ),	/* Flags:  out, return, base type, */
+/* 44 */	NdrFcShort( 0x10 ),	/* x86 Stack size/offset = 16 */
+/* 46 */	0x8,		/* FC_LONG */
 			0x0,		/* 0 */
 
 	/* Procedure SubtractionOfTwoIntegers */
 
-/* 50 */	0x33,		/* FC_AUTO_HANDLE */
+/* 48 */	0x33,		/* FC_AUTO_HANDLE */
 			0x6c,		/* Old Flags:  object, Oi2 */
-/* 52 */	NdrFcLong( 0x0 ),	/* 0 */
-/* 56 */	NdrFcShort( 0x8 ),	/* 8 */
-/* 58 */	NdrFcShort( 0x28 ),	/* X64 Stack size/offset = 40 */
-/* 60 */	NdrFcShort( 0x10 ),	/* 16 */
-/* 62 */	NdrFcShort( 0x24 ),	/* 36 */
-/* 64 */	0x44,		/* Oi2 Flags:  has return, has ext, */
+/* 50 */	NdrFcLong( 0x0 ),	/* 0 */
+/* 54 */	NdrFcShort( 0x8 ),	/* 8 */
+/* 56 */	NdrFcShort( 0x14 ),	/* x86 Stack size/offset = 20 */
+/* 58 */	NdrFcShort( 0x10 ),	/* 16 */
+/* 60 */	NdrFcShort( 0x24 ),	/* 36 */
+/* 62 */	0x44,		/* Oi2 Flags:  has return, has ext, */
 			0x4,		/* 4 */
-/* 66 */	0xa,		/* 10 */
+/* 64 */	0x8,		/* 8 */
 			0x1,		/* Ext Flags:  new corr desc, */
+/* 66 */	NdrFcShort( 0x0 ),	/* 0 */
 /* 68 */	NdrFcShort( 0x0 ),	/* 0 */
 /* 70 */	NdrFcShort( 0x0 ),	/* 0 */
-/* 72 */	NdrFcShort( 0x0 ),	/* 0 */
-/* 74 */	NdrFcShort( 0x0 ),	/* 0 */
 
 	/* Parameter __MIDL__IMyMath0003 */
 
-/* 76 */	NdrFcShort( 0x48 ),	/* Flags:  in, base type, */
-/* 78 */	NdrFcShort( 0x8 ),	/* X64 Stack size/offset = 8 */
-/* 80 */	0x8,		/* FC_LONG */
+/* 72 */	NdrFcShort( 0x48 ),	/* Flags:  in, base type, */
+/* 74 */	NdrFcShort( 0x4 ),	/* x86 Stack size/offset = 4 */
+/* 76 */	0x8,		/* FC_LONG */
 			0x0,		/* 0 */
 
 	/* Parameter __MIDL__IMyMath0004 */
 
-/* 82 */	NdrFcShort( 0x48 ),	/* Flags:  in, base type, */
-/* 84 */	NdrFcShort( 0x10 ),	/* X64 Stack size/offset = 16 */
-/* 86 */	0x8,		/* FC_LONG */
+/* 78 */	NdrFcShort( 0x48 ),	/* Flags:  in, base type, */
+/* 80 */	NdrFcShort( 0x8 ),	/* x86 Stack size/offset = 8 */
+/* 82 */	0x8,		/* FC_LONG */
 			0x0,		/* 0 */
 
 	/* Parameter __MIDL__IMyMath0005 */
 
-/* 88 */	NdrFcShort( 0x2150 ),	/* Flags:  out, base type, simple ref, srv alloc size=8 */
-/* 90 */	NdrFcShort( 0x18 ),	/* X64 Stack size/offset = 24 */
-/* 92 */	0x8,		/* FC_LONG */
+/* 84 */	NdrFcShort( 0x2150 ),	/* Flags:  out, base type, simple ref, srv alloc size=8 */
+/* 86 */	NdrFcShort( 0xc ),	/* x86 Stack size/offset = 12 */
+/* 88 */	0x8,		/* FC_LONG */
 			0x0,		/* 0 */
 
 	/* Return value */
 
-/* 94 */	NdrFcShort( 0x70 ),	/* Flags:  out, return, base type, */
-/* 96 */	NdrFcShort( 0x20 ),	/* X64 Stack size/offset = 32 */
-/* 98 */	0x8,		/* FC_LONG */
+/* 90 */	NdrFcShort( 0x70 ),	/* Flags:  out, return, base type, */
+/* 92 */	NdrFcShort( 0x10 ),	/* x86 Stack size/offset = 16 */
+/* 94 */	0x8,		/* FC_LONG */
 			0x0,		/* 0 */
 
 			0x0
@@ -217,7 +226,7 @@ static const AutomationServerTypeLib_MIDL_TYPE_FORMAT_STRING AutomationServerTyp
 
 
 /* Object interface: IMyMath, ver. 0.0,
-   GUID={0x809A2015,0x4D22,0x4814,{0x9D,0xC4,0x26,0x21,0x18,0x29,0xC2,0x7A}} */
+   GUID={0xA1E4445F,0x9268,0x4FBC,{0x86,0xD3,0x2C,0x69,0x91,0x31,0xB9,0x8F}} */
 
 #pragma code_seg(".orpc")
 static const unsigned short IMyMath_FormatStringOffsetTable[] =
@@ -227,7 +236,7 @@ static const unsigned short IMyMath_FormatStringOffsetTable[] =
     (unsigned short) -1,
     (unsigned short) -1,
     0,
-    50
+    48
     };
 
 static const MIDL_STUBLESS_PROXY_INFO IMyMath_ProxyInfo =
@@ -368,5 +377,5 @@ const ExtendedProxyFileInfo AutomationServerTypeLib_ProxyFileInfo =
 #endif
 
 
-#endif /* defined(_M_AMD64)*/
+#endif /* !defined(_M_IA64) && !defined(_M_AMD64) && !defined(_ARM_) */
 

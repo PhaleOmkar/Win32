@@ -1,0 +1,92 @@
+./01-Win32/00-Project/Chemistry/ChemistryDll/ChemistryDll/ChemistryDll.cpp
+./01-Win32/00-Project/Chemistry/ChemistryDll/ChemistryDll/ChemistryDll.h
+./01-Win32/00-Project/Chemistry/ChemistryHelper/ChemistryHelper/ChemistryDll.h
+./01-Win32/00-Project/Chemistry/ChemistryHelper/ChemistryHelper/ChemistryHelper.cpp
+./01-Win32/00-Project/Physics/Physics/Physics.cpp
+./01-Win32/00-Project/Physics/Physics/Physics.h
+./01-Win32/00-Project/UI/UI/Project.cpp
+./01-Win32/00-Project/UI/UI/Project.h
+./01-Win32/01-Window/CMD/32/MyWindow.cpp
+./01-Win32/01-Window/CMD/64/MyWindow.cpp
+./01-Win32/01-Window/IDE/32/Window/MyWindow.cpp
+./01-Win32/01-Window/IDE/64/Window/MyWindow.cpp
+./01-Win32/02-Message Loop/Events/Events/Window.cpp
+./01-Win32/02-Message Loop/MessageBoxes/MessageBoxes/Window.cpp
+./01-Win32/02-Message Loop/MouseEvent/MouseEvent/Window.cpp
+./01-Win32/03-Paint/HelloWorld/HelloWorld/Window.cpp
+./01-Win32/04-Colors/Colors/Colors/Window.cpp
+./01-Win32/05-Resources/Bitmap/Bitmap/Bitmap.cpp
+./01-Win32/05-Resources/CMD_CustIcon/window.cpp
+./01-Win32/05-Resources/CMD_CustIcon/window.h
+./01-Win32/05-Resources/CustomIcon/CustomIcon/window.cpp
+./01-Win32/05-Resources/CustomIcon/CustomIcon/window.h
+./01-Win32/06-MultiTasking and MultiThreading/3D/3D/3D.cpp
+./01-Win32/06-MultiTasking and MultiThreading/3D/3D/3D.h
+./01-Win32/06-MultiTasking and MultiThreading/3D/AlphaNumeric/3D.h
+./01-Win32/06-MultiTasking and MultiThreading/3D/AlphaNumeric/AlphaNumeric.cpp
+./01-Win32/06-MultiTasking and MultiThreading/3D/AlphaNumeric/AlphaNumeric.h
+./01-Win32/06-MultiTasking and MultiThreading/3D/Shapes/3D.h
+./01-Win32/06-MultiTasking and MultiThreading/3D/Shapes/Shapes.cpp
+./01-Win32/06-MultiTasking and MultiThreading/Colors/Colors/Colors.cpp
+./01-Win32/06-MultiTasking and MultiThreading/KindOfGame/KindOfGame/Game.cpp
+./01-Win32/06-MultiTasking and MultiThreading/KindOfGame/KindOfGame/Snake.h
+./01-Win32/06-MultiTasking and MultiThreading/MultiThreading/MultiThreading/MultiThreading.cpp
+./01-Win32/06-MultiTasking and MultiThreading/SnakeGameFromSir/SnakeGameFromSir/Game.cpp
+./01-Win32/06-MultiTasking and MultiThreading/SnakeGameFromSir/SnakeGameFromSir/Snake.h
+./01-Win32/07-Spash Screen/SplashScreen/MyResources.h
+./01-Win32/07-Spash Screen/SplashScreen/MyWindow.cpp
+./01-Win32/08-Dynamic Link Library/CMD/SquareClient_Def/SquareClient_Def.cpp
+./01-Win32/08-Dynamic Link Library/CMD/SquareClient_Def/SquareClient_Def.h
+./01-Win32/08-Dynamic Link Library/CMD/SquareClient_MS/SquareClient_MS.cpp
+./01-Win32/08-Dynamic Link Library/CMD/SquareClient_MS/Square_MS.h
+./01-Win32/08-Dynamic Link Library/CMD/Square_Def/Square_Def.cpp
+./01-Win32/08-Dynamic Link Library/CMD/Square_Def/Square_Def.h
+./01-Win32/08-Dynamic Link Library/CMD/Square_MS/Square_MS.cpp
+./01-Win32/08-Dynamic Link Library/CMD/Square_MS/Square_MS.h
+./01-Win32/08-Dynamic Link Library/MicrosoftSpecificSpecifier/MyDll.cpp
+./01-Win32/08-Dynamic Link Library/MicrosoftSpecificSpecifier/MyDll.h
+./01-Win32/08-Dynamic Link Library/ModuleDefinitionFile/MyDll.cpp
+./01-Win32/08-Dynamic Link Library/ModuleDefinitionFile/MyDll.h
+./01-Win32/08-Dynamic Link Library/SquareClient_Def/SquareClient_Def.cpp
+./01-Win32/08-Dynamic Link Library/SquareClient_Def/SquareClient_Def.h
+./01-Win32/08-Dynamic Link Library/SquareClient_MS/SquareClient_MS.cpp
+./01-Win32/08-Dynamic Link Library/SquareClient_MS/Square_MS.h
+./01-Win32/08-Dynamic Link Library/Square_Def/Square_Def.cpp
+./01-Win32/08-Dynamic Link Library/Square_Def/Square_Def.h
+./01-Win32/08-Dynamic Link Library/Square_MS/Square_MS.cpp
+./01-Win32/08-Dynamic Link Library/Square_MS/Square_MS.h
+./02-COM/01-Class Factory/Client/ClientOfClassFactoryServerWithRegFile/ClassFactoryServerWithRegFile.h
+./02-COM/01-Class Factory/Client/ClientOfClassFactoryServerWithRegFile/ClientOfClassFactoryServerWithRegFile.cpp
+./02-COM/01-Class Factory/Server/ClassFactoryServerWithRegFile/ClassFactoryServerWithRegFile.cpp
+./02-COM/01-Class Factory/Server/ClassFactoryServerWithRegFile/ClassFactoryServerWithRegFile.h
+./02-COM/01-Class Factory/Server v2/SumSubMulDll/SumSubMulDll.cpp
+./02-COM/01-Class Factory/Server v2/SumSubMulDll/SumSubMulDll.h
+./02-COM/02-Properties Of COM/01-Identity/ClassFactoryServerWithRegFile.h
+./02-COM/02-Properties Of COM/01-Identity/Identity.cpp
+./02-COM/02-Properties Of COM/02-Predictability/ClassFactoryServerWithRegFile.h
+./02-COM/02-Properties Of COM/02-Predictability/Predictability.cpp
+./02-COM/02-Properties Of COM/03-Symmetry/ClassFactoryServerWithRegFile.h
+./02-COM/02-Properties Of COM/03-Symmetry/Symmetry.cpp
+./02-COM/02-Properties Of COM/04-Reflexivity/ClassFactoryServerWithRegFile.h
+./02-COM/02-Properties Of COM/04-Reflexivity/Reflexivity.cpp
+./02-COM/02-Properties Of COM/05-Transitivity/SumSubMulDll.h
+./02-COM/02-Properties Of COM/05-Transitivity/Transitivity.cpp
+./02-COM/03-Containment/ClientOfContainmentComponentWithRegFile/ClientOfContainmentComponentWithRegFile/ClientOfContainmentComponentWithRegFile.cpp
+./02-COM/03-Containment/ClientOfContainmentComponentWithRegFile/ClientOfContainmentComponentWithRegFile/ClientOfContainmentComponentWithRegFile.h
+./02-COM/03-Containment/ContainmentInnerComponentWithRegFile/ContainmentInnerComponentWithRegFile/ContainmentInnerComponentWithRegFile.cpp
+./02-COM/03-Containment/ContainmentInnerComponentWithRegFile/ContainmentInnerComponentWithRegFile/ContainmentInnerComponentWithRegFile.h
+./02-COM/03-Containment/ContainmentOuterComponentWithRegFile/ContainmentOuterComponentWithRegFile/ContainmentInnerComponentWithRegFile.h
+./02-COM/03-Containment/ContainmentOuterComponentWithRegFile/ContainmentOuterComponentWithRegFile/ContainmentOuterComponentWithRegFile.cpp
+./02-COM/03-Containment/ContainmentOuterComponentWithRegFile/ContainmentOuterComponentWithRegFile/ContainmentOuterComponentWithRegFile.h
+./02-COM/04-Aggregation/AggregationInnerComponentWithRegFile/AggregationInnerComponentWithRegFile/AggregationInnerComponentWithRegFile.cpp
+./02-COM/04-Aggregation/AggregationInnerComponentWithRegFile/AggregationInnerComponentWithRegFile/AggregationInnerComponentWithRegFile.h
+./02-COM/04-Aggregation/AggregationOuterComponentWithRegFile/AggregationOuterComponentWithRegFile/AggregationInnerComponentWithRegFile.h
+./02-COM/04-Aggregation/AggregationOuterComponentWithRegFile/AggregationOuterComponentWithRegFile/AggregationOuterComponentWithRegFile.cpp
+./02-COM/04-Aggregation/AggregationOuterComponentWithRegFile/AggregationOuterComponentWithRegFile/AggregationOuterComponentWithRegFile.h
+./02-COM/04-Aggregation/ClientOfAggregationComponentWithRegFile/ClientOfAggregationComponentWithRegFile/ClientOfAggregationComponentWithRegFile.cpp
+./02-COM/04-Aggregation/ClientOfAggregationComponentWithRegFile/ClientOfAggregationComponentWithRegFile/ClientOfAggregationComponentWithRegFile.h
+./02-COM/05-Automation/DllServer/Client/IClassFactoryAutomationClient/IClassFactoryAutomationClient/AutomationServerWithRegFile.h
+./02-COM/05-Automation/DllServer/Client/IClassFactoryAutomationClient/IClassFactoryAutomationClient/IClassFactoryAutomationClient.cpp
+./02-COM/05-Automation/DllServer/Server/AutomationServerWithRegFile/AutomationServerWithRegFile.cpp
+./02-COM/05-Automation/DllServer/Server/AutomationServerWithRegFile/AutomationServerWithRegFile.h
+./02-COM/05-Automation/DllServer/Server/ProxyStub/ProxyStub/AutomationServerProxyStubHeader.h

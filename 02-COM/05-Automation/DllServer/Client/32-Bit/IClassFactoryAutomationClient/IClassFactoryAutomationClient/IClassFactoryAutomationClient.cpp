@@ -113,6 +113,9 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
 		// release
 		pIMyMath->Release();
 		pIMyMath = NULL;
+
+		DestroyWindow(hwnd);
+
 		break;
 
 	case WM_DESTROY:
