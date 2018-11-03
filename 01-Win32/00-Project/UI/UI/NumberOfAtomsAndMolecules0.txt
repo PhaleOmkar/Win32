@@ -1,0 +1,5 @@
+Molecular Mass      : 123 g/mol
+Amount Of Substance : 2 g
+
+Number Of Atoms     : 3.91675e+22
+Number of Molecules : 9.79187e+21 

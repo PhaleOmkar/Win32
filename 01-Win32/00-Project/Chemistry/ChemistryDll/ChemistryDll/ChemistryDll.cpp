@@ -21,6 +21,7 @@ public:
 
 	// IChemistry specific method declaration (inherited)
 	HRESULT __stdcall CalculateNumberOfMolecules(double, double, double *);
+	HRESULT __stdcall CalculateNumberOfAtoms(double, double, int, double *);
 };
 
 class CChemistryClassFactory : public IClassFactory
@@ -123,6 +124,16 @@ HRESULT CChemistry::CalculateNumberOfMolecules(double dMolecularMass, double dMa
 	*pNumberOfMolecules = ((6.022E+23) / dMolecularMass) * dMassInGrams;
 	return(S_OK);
 }
+
+HRESULT CChemistry::CalculateNumberOfAtoms(double dMolecularMass, double dMassInGrams, int iNoOfAtomsInMolecule, double *pNumberOfAtoms)
+{
+	double dNumberOfMolecules = 0.0;
+	CalculateNumberOfMolecules(dMolecularMass, dMassInGrams, &dNumberOfMolecules);
+	*pNumberOfAtoms =  dNumberOfMolecules * iNoOfAtomsInMolecule;
+		
+	return(S_OK);
+}
+
 
 // Implementation of CChemistryClassFactory methods
 CChemistryClassFactory::CChemistryClassFactory(void)

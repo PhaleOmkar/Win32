@@ -1,7 +1,9 @@
+// IChemistry Interface
 class IChemisty : public IUnknown
 {
 public:
 	virtual HRESULT __stdcall CalculateNumberOfMolecules(double, double, double*) = 0;
+	virtual HRESULT __stdcall CalculateNumberOfAtoms(double, double, int, double*) = 0;
 };
 
 // CLSID of Chemistry Component {AE495E66-237D-404E-99D4-7663BD8D2ABC}

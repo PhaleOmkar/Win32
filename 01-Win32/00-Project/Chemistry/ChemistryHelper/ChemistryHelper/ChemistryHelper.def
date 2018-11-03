@@ -1,3 +1,4 @@
 LIBRARY ChemistryHelper
 EXPORTS
-	CalculateNumberOfMolecules PRIVATE
+	CalculateNumberOfMolecules 
+	CalculateNumberOfAtoms

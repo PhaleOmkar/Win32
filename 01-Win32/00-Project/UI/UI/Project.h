@@ -42,6 +42,9 @@
 #define ID_CHEM_LRESULT		303
 #define ID_CHEM_CALCULATE	304
 #define ID_CHEM_RESET		305
+#define ID_CHEM_ETNATOMS	306
+#define ID_CHEM_LRESULTATOM 307
+#define ID_CHEM_CMBCMPDS	308
 
 #pragma endregion
 

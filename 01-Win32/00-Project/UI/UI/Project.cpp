@@ -3,6 +3,7 @@
 #include <Windows.h>
 #include <stdio.h>
 #include "Project.h"
+#include "ChemistryCompounds.h"
 
 #pragma endregion
 
@@ -29,6 +30,7 @@ typedef double(*lpfnCalculateCentripetalAcceleration) (double, double);
 
 // For Chemistry
 typedef double(*lpfnCalculateNumberOfMolecules) (double, double);
+typedef double(*lpfnCalculateNumberOfAtoms) (double, double, int);
 #pragma endregion
 
 #pragma region Main Window
@@ -572,22 +574,29 @@ BOOL CALLBACK ChemDlgProc(HWND hDlg, UINT iMsg, WPARAM wParam, LPARAM lParam)
 {
 	static HMODULE hDll = NULL;
 	static HANDLE hFile = NULL;
+	HWND hwndList = NULL;
 	static int iNoOfFile = 0;
 	static lpfnCalculateNumberOfMolecules CalculateNumberOfMolecules = NULL;
+	static lpfnCalculateNumberOfAtoms CalculateNumberOfAtoms = NULL;
+	static int iOldNoOfAtomsInMolecule;
 	static double dOldMolecularMass;
 	static double dOldAmountOfSubstance;
+	int iNoOfAtomsInMolecule;
 	double dMolecularMass;
 	double dAmountOfSubstance;
 	char szTmp[255] = "";
 	double dResult = 0.0;
+	double dResultAtoms = 0.0;
 
 	switch (iMsg)
 	{
 	#pragma region WM_INITDIALOG
 	case WM_INITDIALOG:
 		// initialize variable
+		iNoOfAtomsInMolecule = 0;
 		dOldMolecularMass = 0.0;
 		dOldAmountOfSubstance = 0.0;
+		iOldNoOfAtomsInMolecule = 0;
 		dMolecularMass = 0.0;
 		dAmountOfSubstance = 0.0;
 
@@ -605,6 +614,22 @@ BOOL CALLBACK ChemDlgProc(HWND hDlg, UINT iMsg, WPARAM wParam, LPARAM lParam)
 			MessageBox(hDlg, TEXT("Unable to locate CalculateNumberOfMolecules function"), TEXT("Error"), MB_OK);
 			EndDialog(hDlg, -1);
 		}
+		
+		CalculateNumberOfAtoms = (lpfnCalculateNumberOfAtoms)GetProcAddress(hDll, "CalculateNumberOfAtoms");
+		if (CalculateNumberOfAtoms == NULL)
+		{
+			MessageBox(hDlg, TEXT("Unable to locate CalculateNumberOfAtoms function"), TEXT("Error"), MB_OK);
+			EndDialog(hDlg, -1);
+		}
+
+		// fill the combo box for predefined compounds
+		hwndList = GetDlgItem(hDlg, ID_CHEM_CMBCMPDS);
+		for (int i = 0; i < iNoOfCompounds; i++) 
+		{
+			int pos = SendMessage(hwndList, CB_ADDSTRING, 0, (LPARAM) arrCompounds[i].szName);
+			SendMessage(hwndList, CB_SETITEMDATA, pos, (LPARAM)arrCompounds[i].iIndex);
+		}
+
 		return TRUE;
 	#pragma endregion
 	
@@ -634,8 +659,17 @@ BOOL CALLBACK ChemDlgProc(HWND hDlg, UINT iMsg, WPARAM wParam, LPARAM lParam)
 				return(TRUE);
 			}
 
+			// Get Number of Atoms in one Molecule
+			GetDlgItemText(hDlg, ID_CHEM_ETNATOMS, szTmp, 100);
+			iNoOfAtomsInMolecule = atoi(szTmp);
+			if (iNoOfAtomsInMolecule == 0)
+			{
+				MessageBox(hDlg, TEXT("Incorrect Amount Of Substance!"), TEXT("Error"), MB_OK);
+				return(TRUE);
+			}
+
 			// Check if already computed
-			if ((dOldAmountOfSubstance == dAmountOfSubstance) && (dOldMolecularMass == dMolecularMass))
+			if ((dOldAmountOfSubstance == dAmountOfSubstance) && (dOldMolecularMass == dMolecularMass) && (iOldNoOfAtomsInMolecule == iNoOfAtomsInMolecule))
 			{
 				MessageBox(hDlg, TEXT("Already Computed!"), TEXT("Info"), MB_OK);
 				return(TRUE);
@@ -643,13 +677,14 @@ BOOL CALLBACK ChemDlgProc(HWND hDlg, UINT iMsg, WPARAM wParam, LPARAM lParam)
 
 			// Compute the value
 			dResult = CalculateNumberOfMolecules(dMolecularMass, dAmountOfSubstance);
+			dResultAtoms = CalculateNumberOfAtoms(dMolecularMass, dAmountOfSubstance, iNoOfAtomsInMolecule);
 
 			// create file to store result
-			wsprintf(szTmp, TEXT("NumberOfMolecules%d.txt"), iNoOfFile++);
+			wsprintf(szTmp, TEXT("NumberOfAtomsAndMolecules%d.txt"), iNoOfFile++);
 			hFile = CreateFile(szTmp, GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
 
 			// display result 
-			sprintf_s(szTmp, TEXT("Molecular Mass      : %g g/mol\nAmount Of Substance : %g g\n\nNumber of Molecules : %g "), dMolecularMass, dAmountOfSubstance, dResult);
+			sprintf_s(szTmp, TEXT("Molecular Mass      : %g g/mol\nAmount Of Substance : %g g\n\nNumber Of Atoms     : %g\nNumber of Molecules : %g "), dMolecularMass, dAmountOfSubstance, dResultAtoms, dResult);
 
 			// display result in message box
 			MessageBox(hDlg, TEXT(szTmp), TEXT("Message"), MB_OK | MB_ICONINFORMATION);
@@ -660,9 +695,13 @@ BOOL CALLBACK ChemDlgProc(HWND hDlg, UINT iMsg, WPARAM wParam, LPARAM lParam)
 			sprintf_s(szTmp, "%g", dResult);
 			SetDlgItemText(hDlg, ID_CHEM_LRESULT, szTmp);
 
+			sprintf_s(szTmp, "%g", dResultAtoms);
+			SetDlgItemText(hDlg, ID_CHEM_LRESULTATOM, szTmp);
+
 			// Set Old state
 			dOldAmountOfSubstance = dAmountOfSubstance;
 			dOldMolecularMass = dMolecularMass;
+			iNoOfAtomsInMolecule = iOldNoOfAtomsInMolecule;
 
 			return TRUE;
 
@@ -688,8 +727,10 @@ BOOL CALLBACK ChemDlgProc(HWND hDlg, UINT iMsg, WPARAM wParam, LPARAM lParam)
 void ChemReset(HWND hDlg)
 {
 	// Reset All Fields
-	SetDlgItemText(hDlg, ID_CHEM_ETMMASS, TEXT(""));
-	SetDlgItemText(hDlg, ID_CHEM_ETAMOUNT, TEXT(""));
-	SetDlgItemText(hDlg, ID_CHEM_LRESULT, TEXT(""));
+	SetDlgItemText(hDlg, ID_CHEM_ETMMASS,		TEXT(""));
+	SetDlgItemText(hDlg, ID_CHEM_ETAMOUNT,		TEXT(""));
+	SetDlgItemText(hDlg, ID_CHEM_ETNATOMS,		TEXT(""));
+	SetDlgItemText(hDlg, ID_CHEM_LRESULTATOM,	TEXT(""));
+	SetDlgItemText(hDlg, ID_CHEM_LRESULT,		TEXT(""));
 }
 #pragma endregion

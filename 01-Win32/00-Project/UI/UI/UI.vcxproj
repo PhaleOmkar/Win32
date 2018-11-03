@@ -118,6 +118,7 @@
     <ClCompile Include="Project.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="ChemistryCompounds.h" />
     <ClInclude Include="Project.h" />
   </ItemGroup>
   <ItemGroup>

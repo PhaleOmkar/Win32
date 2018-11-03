@@ -71,3 +71,19 @@ extern "C" double CalculateNumberOfMolecules(double dMolecularMass, double dMass
 	else
 		return(NULL);
 }
+
+extern "C" double CalculateNumberOfAtoms(double dMolecularMass, double dMassInGrams, int iNoOfAtomsInMolecule)
+{
+	// variables
+	HRESULT hr = S_OK;
+	double NumberOfAtoms = 0;
+
+	// code
+	hr = pIChemistry->CalculateNumberOfAtoms(dMolecularMass, dMassInGrams, iNoOfAtomsInMolecule, &NumberOfAtoms);
+
+	if (SUCCEEDED(hr))
+		return(NumberOfAtoms);
+	else
+		return(NULL);
+}
+
