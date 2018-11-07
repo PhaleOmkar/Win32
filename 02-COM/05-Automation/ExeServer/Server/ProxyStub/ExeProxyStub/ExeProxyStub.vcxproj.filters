@@ -15,21 +15,24 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="ChemistryDll.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="ChemistryCompounds.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="ChemistryHelper.cpp">
+    <ClCompile Include="ProxyStub.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ProxyStubDllData.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ProxyStubGuids.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="ChemistryHelper.def">
+    <None Include="ProxyStub.def">
       <Filter>Source Files</Filter>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="ProxyStubHeader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

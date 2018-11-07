@@ -1,0 +1,24 @@
+import "unknwn.idl";
+// ISum interface
+[
+    object,
+    uuid(0703F26A-B6AC-4E50-983E-275AC15D2DF0),
+    helpstring("ISum Interface"),
+    pointer_default(unique)
+]
+interface ISum : IUnknown
+{
+    HRESULT SumOfTwoIntegers([in] int, [in] int, [in,out] int *);
+};
+
+// ISubtract interface
+[
+    object,
+    uuid(501D0F4A-8303-4174-90A8-4CCEC057CFE9),
+    helpstring("ISubtract interface"),
+    pointer_default(unique)
+]
+interface ISubtract : IUnknown
+{
+    HRESULT SubtractionOfTwoIntegers([in] int, [in] int, [in,out] int *);
+};

@@ -15,21 +15,13 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="ChemistryDll.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="ChemistryCompounds.h">
+    <ClInclude Include="ExeServer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="ChemistryHelper.cpp">
+    <ClCompile Include="ExeServer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="ChemistryHelper.def">
-      <Filter>Source Files</Filter>
-    </None>
   </ItemGroup>
 </Project>
