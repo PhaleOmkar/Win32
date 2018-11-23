@@ -1,0 +1,5 @@
+Windows Registry Editor Version 5.00
+[HKEY_CLASSES_ROOT\Wow6432Node\CLSID\{2C3BC35B-275E-4223-ACDC-1EC606B911FC}]
+@="MonikerServerDll"
+[HKEY_CLASSES_ROOT\Wow6432Node\CLSID\{2C3BC35B-275E-4223-ACDC-1EC606B911FC}\InprocServer32]
+@="C:\\Windows\\SysWOW64\\MonikerDllServer.dll"

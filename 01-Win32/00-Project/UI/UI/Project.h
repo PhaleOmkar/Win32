@@ -48,4 +48,14 @@
 
 #pragma endregion
 
+#pragma region Maths
 
+#define ID_MATHS_GP			400
+#define ID_MATHS_A			401
+#define ID_MATHS_B			402
+#define ID_MATHS_C			403
+#define ID_MATHS_RESULT		404
+#define ID_MATHS_SOLVE		405
+#define ID_MATHS_RESET		406
+
+#pragma endregion

@@ -13,6 +13,7 @@ LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
 BOOL	CALLBACK MainDlgProc(HWND, UINT, WPARAM, LPARAM);
 BOOL	CALLBACK PhyDlgProc(HWND, UINT, WPARAM, LPARAM);
 BOOL	CALLBACK ChemDlgProc(HWND, UINT, WPARAM, LPARAM);
+BOOL	CALLBACK MathsDlgProc(HWND, UINT, WPARAM, LPARAM);
 
 // For Physics
 void PhyDisable(HWND, int);
@@ -20,6 +21,10 @@ void PhyReset(HWND);
 
 // For Chemistry
 void ChemReset(HWND);
+void ChemDisable(HWND, BOOL);
+
+// For Mathematics
+void MathsReset(HWND);
 
 #pragma endregion
 
@@ -31,6 +36,9 @@ typedef double(*lpfnCalculateCentripetalAcceleration) (double, double);
 // For Chemistry
 typedef double(*lpfnCalculateNumberOfMolecules) (double, double);
 typedef double(*lpfnCalculateNumberOfAtoms) (double, double, int);
+
+// For Maths
+typedef long(*lpfnCalculateRootsOfEq) (double, double, double, double *, double *);
 #pragma endregion
 
 #pragma region Main Window
@@ -245,7 +253,7 @@ BOOL CALLBACK MainDlgProc(HWND hDlg, UINT iMsg, WPARAM wParam, LPARAM lParam)
 				break;
 
 			case ID_MAIN_RB_MATHS:
-				DialogBox(hInstance, TEXT("DLGMATHS"), hDlg, PhyDlgProc);
+				DialogBox(hInstance, TEXT("DLGMATHS"), hDlg, MathsDlgProc);
 				break;
 
 			case ID_MAIN_RB_BIO:
@@ -290,6 +298,7 @@ BOOL CALLBACK PhyDlgProc(HWND hDlg, UINT iMsg, WPARAM wParam, LPARAM lParam)
 
 	switch (iMsg)
 	{
+	#pragma region WM_INITDIALOG
 	case WM_INITDIALOG:
 		// initialize variable
 		dOldMass = 0.0;
@@ -331,9 +340,11 @@ BOOL CALLBACK PhyDlgProc(HWND hDlg, UINT iMsg, WPARAM wParam, LPARAM lParam)
 			MessageBox(hDlg, TEXT("Unable to locate CalculateCentrifugalForce function"), TEXT("Error"), MB_OK);
 			EndDialog(hDlg, -1);
 		}
-
+		
 		return TRUE;
+	#pragma endregion
 
+	#pragma region WM_COMMAND
 	case WM_COMMAND:
 		switch (LOWORD(wParam))
 		{
@@ -342,8 +353,10 @@ BOOL CALLBACK PhyDlgProc(HWND hDlg, UINT iMsg, WPARAM wParam, LPARAM lParam)
 		case ID_RBCPACC:
 			iForce = LOWORD(wParam);
 			PhyDisable(hDlg, iForce);
+			dOldMass = dOldRadius = dOldVelocity = 0.0;
 			return TRUE;
 
+		#pragma region ID_CP_COMPUTE
 		case ID_CP_COMPUTE:
 			GetDlgItemText(hDlg, ID_CP_ETMASS, szTmp, 100);
 			dMass = atof(szTmp);
@@ -402,6 +415,9 @@ BOOL CALLBACK PhyDlgProc(HWND hDlg, UINT iMsg, WPARAM wParam, LPARAM lParam)
 
 			return TRUE;
 
+		#pragma endregion
+
+		#pragma region ID_CPA_COMPUTE
 		case ID_CPA_COMPUTE:
 			/*GetDlgItemText(hDlg, ID_CPA_ETMASS, szTmp, 100);
 			dMass = atof(szTmp);
@@ -457,6 +473,7 @@ BOOL CALLBACK PhyDlgProc(HWND hDlg, UINT iMsg, WPARAM wParam, LPARAM lParam)
 			dOldRadius = dRadius;
 			dOldVelocity = dVelocity;
 			break;
+		#pragma endregion
 
 		case ID_CP_RESET:
 		case ID_CPA_RESET:
@@ -468,9 +485,12 @@ BOOL CALLBACK PhyDlgProc(HWND hDlg, UINT iMsg, WPARAM wParam, LPARAM lParam)
 			EndDialog(hDlg, 0);
 			return TRUE;
 		}
-		break;
+		return TRUE;
+	#pragma endregion
 	}
+
 	return FALSE;
+
 }
 
 // Physics Related functions
@@ -587,6 +607,7 @@ BOOL CALLBACK ChemDlgProc(HWND hDlg, UINT iMsg, WPARAM wParam, LPARAM lParam)
 	char szTmp[255] = "";
 	double dResult = 0.0;
 	double dResultAtoms = 0.0;
+	int pos = 0;
 
 	switch (iMsg)
 	{
@@ -614,7 +635,7 @@ BOOL CALLBACK ChemDlgProc(HWND hDlg, UINT iMsg, WPARAM wParam, LPARAM lParam)
 			MessageBox(hDlg, TEXT("Unable to locate CalculateNumberOfMolecules function"), TEXT("Error"), MB_OK);
 			EndDialog(hDlg, -1);
 		}
-		
+
 		CalculateNumberOfAtoms = (lpfnCalculateNumberOfAtoms)GetProcAddress(hDll, "CalculateNumberOfAtoms");
 		if (CalculateNumberOfAtoms == NULL)
 		{
@@ -624,23 +645,52 @@ BOOL CALLBACK ChemDlgProc(HWND hDlg, UINT iMsg, WPARAM wParam, LPARAM lParam)
 
 		// fill the combo box for predefined compounds
 		hwndList = GetDlgItem(hDlg, ID_CHEM_CMBCMPDS);
-		for (int i = 0; i < iNoOfCompounds; i++) 
+
+		pos = SendMessage(hwndList, CB_ADDSTRING, 0, (LPARAM)"--- Custom ---");
+		SendMessage(hwndList, CB_SETITEMDATA, pos, (LPARAM)0);
+
+		for (int i = 0; i < iNoOfCompounds; i++)
 		{
-			int pos = SendMessage(hwndList, CB_ADDSTRING, 0, (LPARAM) arrCompounds[i].szName);
+			pos = SendMessage(hwndList, CB_ADDSTRING, 0, (LPARAM)arrCompounds[i].szName);
 			SendMessage(hwndList, CB_SETITEMDATA, pos, (LPARAM)arrCompounds[i].iIndex);
 		}
 
+		SendMessage(hwndList, CB_SETCURSEL, (WPARAM)0, 0);
+
 		return TRUE;
-	#pragma endregion
-	
+#pragma endregion
+
 	#pragma region WM_COMMAND
 	case WM_COMMAND:
-		
+
+		switch (HIWORD(wParam))
+		{
+		case  CBN_SELCHANGE:
+			// get the selected index from the combo box list
+			pos = (int)SendMessage((HWND)lParam, (UINT)CB_GETCURSEL, (WPARAM)0, (LPARAM)0);
+
+			if (pos == 0)
+				ChemDisable(hDlg, FALSE);
+			else
+			{
+				ChemDisable(hDlg, TRUE);
+
+				sprintf_s(szTmp, "%g", arrCompounds[pos - 1].dMolecularMass);
+				SetDlgItemText(hDlg, ID_CHEM_ETMMASS, szTmp);
+
+				sprintf_s(szTmp, "%d", arrCompounds[pos - 1].iNoOfAtoms);
+				SetDlgItemText(hDlg, ID_CHEM_ETNATOMS, szTmp);
+
+			}
+
+			return TRUE;
+		}
+
 		switch (LOWORD(wParam))
 		{
 
 		case ID_CHEM_CALCULATE:
-			
+
 			// Get Molecular Mass
 			GetDlgItemText(hDlg, ID_CHEM_ETMMASS, szTmp, 100);
 			dMolecularMass = atof(szTmp);
@@ -715,12 +765,11 @@ BOOL CALLBACK ChemDlgProc(HWND hDlg, UINT iMsg, WPARAM wParam, LPARAM lParam)
 			return TRUE;
 		}
 
-		break;
+		return TRUE;
 	#pragma endregion
 	}
-
-	return FALSE;
 	
+	return(FALSE);
 }
 
 // Chemistry Related functions
@@ -732,5 +781,138 @@ void ChemReset(HWND hDlg)
 	SetDlgItemText(hDlg, ID_CHEM_ETNATOMS,		TEXT(""));
 	SetDlgItemText(hDlg, ID_CHEM_LRESULTATOM,	TEXT(""));
 	SetDlgItemText(hDlg, ID_CHEM_LRESULT,		TEXT(""));
+}
+
+void ChemDisable(HWND hDlg, BOOL fDisable)
+{
+	HWND hControl = NULL;
+	ChemReset(hDlg);
+	
+	hControl = GetDlgItem(hDlg, ID_CHEM_ETMMASS);
+	EnableWindow(hControl, !fDisable);
+		
+	hControl = GetDlgItem(hDlg, ID_CHEM_ETNATOMS);
+	EnableWindow(hControl, !fDisable);
+}
+
+#pragma endregion
+
+#pragma region Maths
+// Maths Dialog Procedure
+BOOL CALLBACK MathsDlgProc(HWND hDlg, UINT iMsg, WPARAM wParam, LPARAM lParam)
+{
+	static HMODULE hDll = NULL;
+	static lpfnCalculateRootsOfEq CalculateRootsOfEq = NULL;
+	double dA, dB, dC;
+	double dRoot1, dRoot2;
+	long lNoOfRoots;
+	char szTmp[255] = "";
+
+	switch (iMsg)
+	{
+	#pragma region WM_INITDIALOG
+	case WM_INITDIALOG:
+
+		// Load Maths DLL
+		hDll = LoadLibrary(TEXT("MathsHelper.dll"));
+		if (hDll == NULL)
+		{
+			MessageBox(hDlg, TEXT("Unable to load Maths DLL"), TEXT("Error"), MB_OK);
+			EndDialog(hDlg, -1);
+		}
+
+		// Get function pointer
+		CalculateRootsOfEq = (lpfnCalculateRootsOfEq)GetProcAddress(hDll, "CalculateRootsOfEq");
+		if (CalculateRootsOfEq == NULL)
+		{
+			MessageBox(hDlg, TEXT("Unable to locate CalculateRootsOfEq function"), TEXT("Error"), MB_OK);
+			EndDialog(hDlg, -1);
+		}
+		
+		return TRUE;
+	#pragma endregion
+
+	#pragma region WM_COMMAND
+	case WM_COMMAND:
+		switch (LOWORD(wParam))
+		{
+		case ID_MATHS_SOLVE:
+
+			// Get a
+			GetDlgItemText(hDlg, ID_MATHS_A, szTmp, 100);
+			dA = atof(szTmp);
+			if (dA == 0.0)
+			{
+				MessageBox(hDlg, TEXT("Coefficient of x² (a) cannot be zero!"), TEXT("Error"), MB_OK);
+				return(TRUE);
+			}
+
+			// Get b
+			GetDlgItemText(hDlg, ID_MATHS_B, szTmp, 100);
+			dB = atof(szTmp);
+			if (dB == 0.0)
+			{
+				SetDlgItemText(hDlg, ID_MATHS_B, TEXT("0.0"));
+			}
+
+			// Get c
+			GetDlgItemText(hDlg, ID_MATHS_C, szTmp, 100);
+			dC = atof(szTmp);
+			if (dC == 0.0)
+			{
+				SetDlgItemText(hDlg, ID_MATHS_C, TEXT("0.0"));
+			}
+
+			// Solve the equation! 
+			lNoOfRoots = CalculateRootsOfEq(dA, dB, dC, &dRoot1, &dRoot2);
+
+			switch (lNoOfRoots)
+			{
+
+			case 0:
+				sprintf_s(szTmp, "Imaginary roots");
+				break;
+
+			case 1:
+				sprintf_s(szTmp, "%g", dRoot1);
+				break;
+
+			case 2:
+				sprintf_s(szTmp, "%g and %g", dRoot1, dRoot2);
+				break;
+			}
+
+			SetDlgItemText(hDlg, ID_MATHS_RESULT, szTmp);
+
+			return TRUE;
+
+		case ID_MATHS_RESET:
+			MathsReset(hDlg);
+			break;
+
+		case IDCANCEL:
+			FreeLibrary(hDll);
+			EndDialog(hDlg, 0);
+			return TRUE;
+		}
+
+		return TRUE;
+	#pragma endregion
+
+
+	}
+
+	return FALSE;
+}
+
+// Maths Related functions
+void MathsReset(HWND hDlg)
+{
+	// Reset All Fields
+	SetDlgItemText(hDlg, ID_MATHS_A,		TEXT(""));
+	SetDlgItemText(hDlg, ID_MATHS_B,		TEXT(""));
+
+	SetDlgItemText(hDlg, ID_MATHS_C,		TEXT(""));
+	SetDlgItemText(hDlg, ID_MATHS_RESULT,	TEXT(""));
 }
 #pragma endregion

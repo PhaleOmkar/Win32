@@ -1,4 +1,4 @@
-Velocity: 1 m/s
-Radius  : 1 m
+Velocity: 4 m/s
+Radius  : 134 m
 
-Centripetal Acceleration: 1 m/s²
+Centripetal Acceleration: 0.119403 m/s²
