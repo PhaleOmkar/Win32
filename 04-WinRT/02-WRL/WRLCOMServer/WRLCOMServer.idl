@@ -1,0 +1,30 @@
+import "inspectable.idl";
+import "Windows.Foundation.idl";
+
+#define COMPONENT_VERSION 1.0
+
+namespace WRLCOMServer
+{
+    interface ISum;
+	interface ISubtract;
+    runtimeclass CSumSubtract;
+
+	[uuid(0be9429f-2c7a-40e8-bb0a-85bcb1749367), version(COMPONENT_VERSION), exclusiveto(CSumSubtract)]
+    interface ISum : IInspectable
+    {
+		HRESULT SumOfTwoIntegers([in] int a, [in] int b, [out, retval] int* value);
+    }
+
+	[uuid(CD3DFDF1-A779-4E30-B345-5281C40E10F4), version(COMPONENT_VERSION), exclusiveto(CSumSubtract)]
+	interface ISubtract : IInspectable
+	{
+		HRESULT SubtractionOfTwoIntegers([in] int a, [in] int b, [out, retval] int* value);
+	}
+
+    [version(COMPONENT_VERSION), activatable(COMPONENT_VERSION)]
+	runtimeclass CSumSubtract
+    {
+        [default] interface ISum;
+		interface ISubtract;
+    }
+}
