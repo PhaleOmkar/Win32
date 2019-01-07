@@ -17,7 +17,7 @@ int main(int argc, char *argv[])
 	glutInitDisplayMode(GLUT_SINGLE | GLUT_RGBA);
 	glutInitWindowSize(800, 600);
 	glutInitWindowPosition(100, 100);
-	glutCreateWindow("My First OpenGL Program - Rutwik Choughule");
+	glutCreateWindow("Rectangle");
 
 	initialize();
 
@@ -59,21 +59,18 @@ void display(void)
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 
-	glBegin(GL_TRIANGLES);
+
+	// Origin for OpenGL is located at LOWER LEFT corner
+	glBegin(GL_QUADS);
 
 	glColor3f(1.0f, 0.0f, 0.0f);
-	glVertex2f(0.0f, 1.0f);
+	glVertex2f(-1.0f, 1.0f);
 	glColor3f(0.0f, 1.0f, 0.0f);
-	glVertex2f(-1.0f, -0.75f);
+	glVertex2f(1.0f, 1.0f);
 	glColor3f(0.0f, 0.0f, 1.0f);
-	glVertex2f(1.0f, -0.75f);
-	
-	glColor3f(1.0f, 0.0f, 0.0f);
-	glVertex2f(0.0f, -1.0f);
-	glColor3f(0.0f, 1.0f, 0.0f);
-	glVertex2f(-1.0f, 0.75f);
-	glColor3f(0.0f, 0.0f, 1.0f);
-	glVertex2f(1.0f, 0.75f);
+	glVertex2f(1.0f, -1.0f);
+	glColor3f(1.0f, 1.0f, 0.0f);
+	glVertex2f(-1.0f, -1.0f);
 
 	glEnd();
 

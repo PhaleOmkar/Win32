@@ -1,0 +1,3 @@
+Writing result to HTML page
+
+I've added an HTML template string, so that the result of each dialog box is written in html format. For each subject, a html file with the respective name of subject will be created, and the result will be stored in it.

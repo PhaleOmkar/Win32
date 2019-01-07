@@ -2,6 +2,7 @@
 
 #include <Windows.h>
 #include <stdio.h>
+#include <math.h>
 #include "Project.h"
 #include "ChemistryCompounds.h"
 
@@ -75,7 +76,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszCmdLi
 		WS_OVERLAPPEDWINDOW,
 		CW_USEDEFAULT,
 		CW_USEDEFAULT,
-		CW_USEDEFAULT,
+		CW_USEDEFAULT, 
 		CW_USEDEFAULT,
 		NULL,
 		NULL,
@@ -189,7 +190,9 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
 			//DrawText(hdc, TEXT("\n\n\n\n\n\n\n\n\n\n\n            Press    for Biology  "), -1, &rc, DT_VCENTER | DT_LEFT);
 			//DrawText(hdc, TEXT("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n        Press    to Quit      "), -1, &rc, DT_VCENTER | DT_LEFT);
 
-			DrawText(hdc, TEXT("Press       to Continue"), -1, &rc, DT_BOTTOM | DT_CENTER | DT_SINGLELINE);
+			DrawText(hdc, TEXT("Press       to Continue\n"), -1, &rc, DT_BOTTOM | DT_CENTER | DT_SINGLELINE);
+			DrawText(hdc, TEXT("\n\n\n    ASTROMEDICOMP"), -1, &rc, DT_LEFT);
+			DrawText(hdc, TEXT("\n\n\n    Rutwik Choughule    "), -1, &rc, DT_RIGHT);
 
 			SetTextColor(hdc, RGB(255, 0, 0));
 			//DrawText(hdc, TEXT("\n\n\n\n\n              P                   "), -1, &rc, DT_VCENTER | DT_LEFT);
@@ -198,7 +201,10 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
 			//DrawText(hdc, TEXT("\n\n\n\n\n\n\n\n\n\n\n                  B               "), -1, &rc, DT_VCENTER | DT_LEFT);
 			//DrawText(hdc, TEXT("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n              Q               "), -1, &rc, DT_VCENTER | DT_LEFT);
 
-			DrawText(hdc, TEXT("      Space            "), -1, &rc, DT_BOTTOM | DT_CENTER | DT_SINGLELINE);
+			DrawText(hdc, TEXT("      Space            \n"), -1, &rc, DT_BOTTOM | DT_CENTER | DT_SINGLELINE);
+			DrawText(hdc, TEXT("\n\n           WM_APP"), -1, &rc, DT_LEFT);
+			DrawText(hdc, TEXT("\n\n    WinRT2018           "), -1, &rc, DT_RIGHT);
+
 		}
 		EndPaint(hwnd, &ps);
 		break;
@@ -292,6 +298,7 @@ BOOL CALLBACK PhyDlgProc(HWND hDlg, UINT iMsg, WPARAM wParam, LPARAM lParam)
 	double dVelocity;
 	double dRadius;
 	char szTmp[255] = "";
+	char szHTML[1024] = "";
 	double dResult = 0.0;
 	HDC hDC = NULL;
 	HWND hControl = NULL;
@@ -393,17 +400,20 @@ BOOL CALLBACK PhyDlgProc(HWND hDlg, UINT iMsg, WPARAM wParam, LPARAM lParam)
 			dResult = CalculateCentripetalForce(dMass, dVelocity, dRadius);
 
 			// create file to store result
-			wsprintf(szTmp, TEXT("CentripetalForce%d.txt"), iNoOfFile++);
+			wsprintf(szTmp, TEXT("CentripetalForce%d.html"), iNoOfFile++);
 			hFile = CreateFile(szTmp, GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
-
+						
 			// display result 
 			sprintf_s(szTmp, TEXT("Mass    : %g kg\nVelocity: %g m/s\nRadius  : %g m\n\nCentripetal Force: %g N"), dMass, dVelocity, dRadius, dResult);
 
 			// display result in message box
 			MessageBox(hDlg, TEXT(szTmp), TEXT("Message"), MB_OK | MB_ICONINFORMATION);
+					
+			sprintf_s(szHTML, "<!DOCTYPE html><html><head><title>%s</title></head><body style=\"background: black; color: white; font - family: monospace; \"> <Center><div><h1 style=\"color: red\">%s</h1><table cellspacing=\"10\" style=\"border - spacing : 20px\"><tbody ><tr> <td><h3>%s</h3></td> <td><h3>%g</h3></td> </tr><tr> <td><h3>%s</h3></td> <td><h3>%g</h3></td> </tr><tr> <td><h3>%s</h3></td> <td><h3>%g</h3></td> </tr><tr> <td><h3>%s</h3></td> <td><h3>%g</h3></td> </tr></tbody></table></div></Center></body></html>", "Physics", "Centripetal Force", "Mass", dMass, "Velocity", dVelocity, "Radius", dRadius, "Centripetal Force", dResult);
 
 			// write result to file
-			WriteFile(hFile, szTmp, strlen(szTmp), NULL, NULL);
+			WriteFile(hFile, szHTML, strlen(szHTML), NULL, NULL);
+			CloseHandle(hFile);
 
 			sprintf_s(szTmp, "%g", dResult);
 			SetDlgItemText(hDlg, ID_CP_ETRESULT, szTmp);
@@ -454,7 +464,7 @@ BOOL CALLBACK PhyDlgProc(HWND hDlg, UINT iMsg, WPARAM wParam, LPARAM lParam)
 			dResult = CalculateCentripetalAcceleration(dVelocity, dRadius);
 
 			// create file to store result
-			wsprintf(szTmp, TEXT("CentripetalAcceleration%d.txt"), iNoOfFile++);
+			wsprintf(szTmp, TEXT("CentripetalAcceleration%d.html"), iNoOfFile++);
 			hFile = CreateFile(szTmp, GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
 
 			// display result 
@@ -463,8 +473,11 @@ BOOL CALLBACK PhyDlgProc(HWND hDlg, UINT iMsg, WPARAM wParam, LPARAM lParam)
 			// display result in message box
 			MessageBox(hDlg, TEXT(szTmp), TEXT("Message"), MB_OK | MB_ICONINFORMATION);
 
+			sprintf_s(szHTML, "<!DOCTYPE html><html><head><title>%s</title></head><body style=\"background: black; color: white; font - family: monospace; \"> <Center><div><h1 style=\"color: red\">%s</h1><table cellspacing=\"10\" style=\"border - spacing : 20px\"><tbody ><tr> <td><h3>%s</h3></td> <td><h3>%g</h3></td> </tr><tr> <td><h3>%s</h3></td> <td><h3>%g</h3></td> </tr><tr> <td><h3>%s</h3></td> <td><h3>%g</h3></td> </tr></tbody></table></div></Center></body></html>", "Physics", "Centripetal Acceleration", "Velocity", dVelocity, "Radius", dRadius, "Centripetal Acceleration", dResult);
+
 			// write result to file
-			WriteFile(hFile, szTmp, strlen(szTmp), NULL, NULL);
+			WriteFile(hFile, szHTML, strlen(szHTML), NULL, NULL);
+			CloseHandle(hFile);
 
 			sprintf_s(szTmp, "%g", dResult);
 			SetDlgItemText(hDlg, ID_CPA_ETRESULT, szTmp);
@@ -605,6 +618,7 @@ BOOL CALLBACK ChemDlgProc(HWND hDlg, UINT iMsg, WPARAM wParam, LPARAM lParam)
 	double dMolecularMass;
 	double dAmountOfSubstance;
 	char szTmp[255] = "";
+	char szHTML[1024] = "";
 	double dResult = 0.0;
 	double dResultAtoms = 0.0;
 	int pos = 0;
@@ -730,7 +744,7 @@ BOOL CALLBACK ChemDlgProc(HWND hDlg, UINT iMsg, WPARAM wParam, LPARAM lParam)
 			dResultAtoms = CalculateNumberOfAtoms(dMolecularMass, dAmountOfSubstance, iNoOfAtomsInMolecule);
 
 			// create file to store result
-			wsprintf(szTmp, TEXT("NumberOfAtomsAndMolecules%d.txt"), iNoOfFile++);
+			wsprintf(szTmp, TEXT("NumberOfAtomsAndMolecules%d.html"), iNoOfFile++);
 			hFile = CreateFile(szTmp, GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
 
 			// display result 
@@ -738,9 +752,14 @@ BOOL CALLBACK ChemDlgProc(HWND hDlg, UINT iMsg, WPARAM wParam, LPARAM lParam)
 
 			// display result in message box
 			MessageBox(hDlg, TEXT(szTmp), TEXT("Message"), MB_OK | MB_ICONINFORMATION);
+			
+			sprintf_s(szHTML, 
+				"<!DOCTYPE html><html><head><title>%s</title></head><body style=\"background: black; color: white; font - family: monospace; \"> <Center><div><h1 style=\"color: red\">%s</h1><table cellspacing=\"10\" style=\"border - spacing : 20px\"><tbody ><tr> <td><h3>%s</h3></td> <td><h3>%g</h3></td> </tr><tr> <td><h3>%s</h3></td> <td><h3>%g</h3></td> </tr><tr> <td><h3>%s</h3></td> <td><h3>%g</h3></td> </tr><tr> <td><h3>%s</h3></td> <td><h3>%g</h3></td> </tr></tbody></table></div></Center></body></html>", "Chemistry", "Number Of Atoms And Molecules",
+				"Molecular Mass", dMolecularMass, "Amount Of Substance", dAmountOfSubstance, "Number Of Atoms", dResultAtoms, "Number Of Molecules", dResult);
 
 			// write result to file
-			WriteFile(hFile, szTmp, strlen(szTmp), NULL, NULL);
+			WriteFile(hFile, szHTML, strlen(szHTML), NULL, NULL);
+			CloseHandle(hFile);
 
 			sprintf_s(szTmp, "%g", dResult);
 			SetDlgItemText(hDlg, ID_CHEM_LRESULT, szTmp);
@@ -803,10 +822,15 @@ BOOL CALLBACK MathsDlgProc(HWND hDlg, UINT iMsg, WPARAM wParam, LPARAM lParam)
 {
 	static HMODULE hDll = NULL;
 	static lpfnCalculateRootsOfEq CalculateRootsOfEq = NULL;
+	static HANDLE hFile = NULL;
+	static int iNoOfFile = 0;
 	double dA, dB, dC;
 	double dRoot1, dRoot2;
 	long lNoOfRoots;
 	char szTmp[255] = "";
+	char szTmp1[255] = "";
+	char szHTML[1024] = "";
+	char chSign1 = '+', chSign2 = '+';
 
 	switch (iMsg)
 	{
@@ -866,6 +890,11 @@ BOOL CALLBACK MathsDlgProc(HWND hDlg, UINT iMsg, WPARAM wParam, LPARAM lParam)
 			// Solve the equation! 
 			lNoOfRoots = CalculateRootsOfEq(dA, dB, dC, &dRoot1, &dRoot2);
 
+			
+			// create file to store result
+			wsprintf(szTmp, TEXT("RootsOfEqn%d.html"), iNoOfFile++);
+			hFile = CreateFile(szTmp, GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+			
 			switch (lNoOfRoots)
 			{
 
@@ -881,6 +910,21 @@ BOOL CALLBACK MathsDlgProc(HWND hDlg, UINT iMsg, WPARAM wParam, LPARAM lParam)
 				sprintf_s(szTmp, "%g and %g", dRoot1, dRoot2);
 				break;
 			}
+
+			// Write to HTML string
+			if (dB < 0) chSign1 = '-';
+			if (dC < 0) chSign2 = '-';
+			sprintf_s(szTmp1, "%gx² %c %gx %c %g = 0", dA, chSign1, fabs(dB), chSign2, fabs(dC));
+
+			sprintf_s(szHTML,
+				"<!DOCTYPE html><html><head><title>%s</title></head><body style=\"background: black; color: white; font - family: monospace; \"> <Center><div><h1 style=\"color: red\">%s</h1><table cellspacing=\"10\" style=\"border - spacing : 20px\"><tbody ><tr> <td><h3>%s</h3></td> <td><h3>%s</h3></td> </tr><tr> <td><h3>%s</h3></td> <td><h3>%s</h3></td> </tr></tbody></table></div></Center></body></html>",
+				"Mathematics", "Roots Of Quadratic Equation",
+				"Equation", szTmp1, "Roots", szTmp);
+
+
+			// write result to file
+			WriteFile(hFile, szHTML, strlen(szHTML), NULL, NULL);
+			CloseHandle(hFile);
 
 			SetDlgItemText(hDlg, ID_MATHS_RESULT, szTmp);
 
