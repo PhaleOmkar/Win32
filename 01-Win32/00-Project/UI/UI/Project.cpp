@@ -27,6 +27,9 @@ void ChemDisable(HWND, BOOL);
 // For Mathematics
 void MathsReset(HWND);
 
+// Helper Functions
+void MakeFullScreen(HWND);
+
 #pragma endregion
 
 #pragma region External Functions
@@ -116,6 +119,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
 	case WM_CREATE:
 		hInstance = (HINSTANCE)GetWindowLong(hwnd, GWL_HINSTANCE);
 		hbmpImage = LoadBitmap(hInstance, MAKEINTRESOURCE(BMPEARTH));
+		MakeFullScreen(hwnd);
 		break;
 
 	case WM_KEYDOWN:
@@ -191,8 +195,8 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
 			//DrawText(hdc, TEXT("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n        Press    to Quit      "), -1, &rc, DT_VCENTER | DT_LEFT);
 
 			DrawText(hdc, TEXT("Press       to Continue\n"), -1, &rc, DT_BOTTOM | DT_CENTER | DT_SINGLELINE);
-			DrawText(hdc, TEXT("\n\n\n    ASTROMEDICOMP"), -1, &rc, DT_LEFT);
-			DrawText(hdc, TEXT("\n\n\n    Rutwik Choughule    "), -1, &rc, DT_RIGHT);
+			DrawText(hdc, TEXT("\n\n    ASTROMEDICOMP"), -1, &rc, DT_LEFT);
+			DrawText(hdc, TEXT("\n\n    Rutwik Choughule    "), -1, &rc, DT_RIGHT);
 
 			SetTextColor(hdc, RGB(255, 0, 0));
 			//DrawText(hdc, TEXT("\n\n\n\n\n              P                   "), -1, &rc, DT_VCENTER | DT_LEFT);
@@ -202,8 +206,8 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
 			//DrawText(hdc, TEXT("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n              Q               "), -1, &rc, DT_VCENTER | DT_LEFT);
 
 			DrawText(hdc, TEXT("      Space            \n"), -1, &rc, DT_BOTTOM | DT_CENTER | DT_SINGLELINE);
-			DrawText(hdc, TEXT("\n\n           WM_APP"), -1, &rc, DT_LEFT);
-			DrawText(hdc, TEXT("\n\n    WinRT2018           "), -1, &rc, DT_RIGHT);
+			DrawText(hdc, TEXT("\n    GROUP: WM_APP"), -1, &rc, DT_LEFT);
+			DrawText(hdc, TEXT("\n       WinRT 2018       "), -1, &rc, DT_RIGHT);
 
 		}
 		EndPaint(hwnd, &ps);
@@ -959,4 +963,29 @@ void MathsReset(HWND hDlg)
 	SetDlgItemText(hDlg, ID_MATHS_C,		TEXT(""));
 	SetDlgItemText(hDlg, ID_MATHS_RESULT,	TEXT(""));
 }
+#pragma endregion
+
+#pragma region Helper Functions
+
+void MakeFullScreen(HWND hwnd)
+{
+	DWORD dwStyle;
+	MONITORINFO MI;
+
+	dwStyle = GetWindowLong(hwnd, GWL_STYLE);
+	MI = { sizeof(MONITORINFO) };
+	if (GetMonitorInfo(MonitorFromWindow(hwnd, MONITORINFOF_PRIMARY), &MI))
+	{
+		SetWindowLong(hwnd, GWL_STYLE, dwStyle & ~WS_OVERLAPPEDWINDOW);
+		SetWindowPos(hwnd,
+			HWND_TOP,
+			MI.rcMonitor.left,
+			MI.rcMonitor.top,
+			MI.rcMonitor.right - MI.rcMonitor.left,
+			MI.rcMonitor.bottom - MI.rcMonitor.top,
+			SWP_NOZORDER | SWP_FRAMECHANGED);
+	}
+	
+}
+
 #pragma endregion
